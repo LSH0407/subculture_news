@@ -20,6 +20,28 @@
     "description": "[신규] 오피 & 도깨비불 / [복각] 이블린 픽업 시작"
   },
   {
+    "game_id": "switch_1234567",
+    "name": "젤다의 전설: 왕국의 눈물",
+    "version": "",
+    "update_date": "2025-10-15",
+    "description": "발매예정 · 액션 어드벤처 · 79,800원",
+    "platform": "switch",
+    "url": "https://www.nintendo.co.kr/software/switch/az3ha/",
+    "tags": "액션, 어드벤처, 오픈월드, 퍼즐, RPG",
+    "summary": "젤다의 전설 시리즈의 새로운 모험. 하이랄 왕국을 구하기 위한 링크의 여정이 시작됩니다."
+  },
+  {
+    "game_id": "switch_2345678",
+    "name": "마리오 카트 8 디럭스",
+    "version": "",
+    "update_date": "2025-10-20",
+    "description": "발매예정 · 레이싱 · 65,000원",
+    "platform": "switch",
+    "url": "https://www.nintendo.co.kr/software/switch/az3ha/",
+    "tags": "레이싱, 멀티플레이어, 캐주얼, 파티게임",
+    "summary": "마리오와 친구들과 함께하는 최고의 레이싱 게임. 새로운 트랙과 캐릭터가 추가됩니다."
+  },
+  {
     "game_id": "steam_2106150",
     "version": "",
     "update_date": "2025-09-03",
