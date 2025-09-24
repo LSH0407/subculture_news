@@ -7,6 +7,13 @@
     "description": "바이오하자드 콜라보 업데이트 · SSR 에이다 웡 픽업 시작"
   },
   {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2025-10-02T00:00:00+09:00",
+    "end_date": "2025-10-02T07:00:00+09:00",
+    "description": "바이오하자드 콜라보 · SSR 질 발렌타인 픽업"
+  },
+  {
     "game_id": "star_rail",
     "version": "3.6",
     "update_date": "2025-09-24T07:00:00+09:00",
