@@ -684,6 +684,21 @@ function setupCalendar(gameMap) {
         events: []
     });
     
+    // 상단 우측 범례 동적 생성
+    const titleBar = el.querySelector('.fc-header-toolbar') || document.querySelector('.fc-header-toolbar');
+    if (titleBar && !document.getElementById('typeLegend')) {
+        const legend = document.createElement('div');
+        legend.id = 'typeLegend';
+        legend.innerHTML = `
+            <span><i class="dot" style="background:#0d6efd"></i>업데이트</span>
+            <span><i class="dot" style="background:#ffc107"></i>방송</span>
+            <span><i class="dot" style="background:#198754"></i>신규발매</span>
+            <span><i class="dot" style="background:#dc3545"></i>종료</span>
+        `;
+        titleBar.style.position = 'relative';
+        titleBar.appendChild(legend);
+    }
+
     // 탭이 없으므로 제거
     
     state.calendar.render();
