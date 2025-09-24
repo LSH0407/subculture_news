@@ -1,11 +1,5 @@
 [
-  {
-    "game_id": "nikke",
-    "version": "",
-    "update_date": "2025-09-24T00:00:00+09:00",
-    "end_date": "2025-09-24T07:00:00+09:00",
-    "description": "바이오하자드 콜라보 업데이트 · SSR 에이다 웡 픽업 시작"
-  },
+
   {
     "game_id": "nikke",
     "version": "",
@@ -26,10 +20,8 @@
     "version": "3.6",
     "update_date": "2025-09-24T07:00:00+09:00",
     "end_date": "2025-09-24T12:00:00+09:00",
-    "description": "안녕하세요, 개척자님! 이번 이벤트 워프 기간은 3.6 버전 업데이트 후 ~ 2025/10/15 11:59 (서버 시간)이며, 다음과 같은 내용이 포함됩니다.",
-    
-    "url": "https://cafe.naver.com/honkaistarrail/651565",
-    "header_image": "https://cafeptthumb-phinf.pstatic.net/MjAyNTA5MjNfMjMx/MDAxNzU4NTkwOTEzMTM1.EBMlDsEulNN_oqGfxLXnILJJNnhb_sndLxfAiOUzQKog.SVzjGV2zHavD8Q93dhQRyQcll_5Afva6kJewQHvQx0Eg.PNG/KO-3.6%E4%B8%8A%E5%8D%8A%E5%8D%A1%E6%B1%A0%E5%85%AC%E5%91%8A_1920x1080.png?type=w1600"
+    "description": "[신규] 에버나이트 픽업가챠 · [복각] 더 헤르타 픽업가챠",
+    "url": "https://cafe.naver.com/honkaistarrail/651565"
   },
   {
     "game_id": "zzz",
