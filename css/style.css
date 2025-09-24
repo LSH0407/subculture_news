@@ -45,6 +45,22 @@ body {
     margin: 1px 0;
 }
 
+/* 더보기(popover) 내부 칩 스타일 일치화 */
+.fc-popover .fc-daygrid-event-harness .fc-daygrid-event, .fc-popover .fc-event {
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+.fc-popover .fc-event-title {
+    display: block !important;
+}
+.fc-popover .fc-daygrid-event-harness .fc-daygrid-event > .fc-event-main {
+    padding: 0 !important;
+}
+.fc-popover .fc-event-main > div.event-chip {
+    margin: 2px 0;
+}
+
 /* 일정이 없는 날짜도 명확하게 표시 */
 .fc-daygrid-day-number {
     font-weight: 600;

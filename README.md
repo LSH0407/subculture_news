@@ -6,46 +6,45 @@
 
 ### 📅 달력 뷰
 - **FullCalendar** 기반 월간 달력
-- 게임별 업데이트 일정을 시각적으로 표시
+- 게임별 업데이트/방송/신규발매 일정을 시각적으로 표시
 - 하루 최대 이벤트 수 설정 가능 (5개, 10개, 15개, 20개, 제한 없음)
-- 이전/다음 달 날짜도 함께 표시
+- 이전/다음 달 날짜도 함께 표시, 오늘 날짜 강조(틴트)
+- 상단 우측 **범례**(업데이트/방송/신규발매/종료) 제공
 
 ### 🎮 게임 필터링
-- **개별 게임 선택**: 니케, 림버스, 명조, 원신, 스타레일, 젠레스존제로
+- **개별 게임 선택**: 니케, 명조, 원신, 붕괴: 스타레일, 젠레스 존 제로
 - **Steam 게임 카테고리**: 모든 Steam 게임을 하나의 체크박스로 관리
 - **닌텐도 스위치 게임 카테고리**: Switch 게임들을 별도 카테고리로 관리
 - **전체 선택/해제** 기능
 
 ### 🖼️ 이벤트 표시
 - **썸네일**: 기존 게임은 게임 이미지, 신작은 플랫폼 아이콘 (Steam/Switch)
-- **게임명**: 텍스트 오버플로우 처리로 깔끔한 표시
-- **툴팁**: 마우스 호버 시 상세 정보 표시
-  - 게임 제목 (전체)
-  - 헤더 이미지 (Steam/Switch 게임)
-  - 인기 태그 (상위 5개)
-  - 게임 설명
+- **유형별 색상**:
+  - 업데이트: 파랑(#0d6efd)
+  - 공식방송: 황금(#ffc107)
+  - 신규발매: 초록(#198754)
+  - 종료일: 빨강(#dc3545)
+- **정렬**: 동일 날짜에서 Steam/Switch는 후순위(모바일/고정 게임 먼저)
+- **툴팁**: 마우스 호버 시 상세 정보 표시(제목, 헤더 이미지, 태그 상위 5개, 설명). 줄바꿈 가독성 개선(pre-line)
 
 ### 🔗 상호작용
-- **클릭**: Steam 게임은 Steam 스토어로, 기타 게임은 상세 페이지로 이동
-- **반응형 디자인**: 모바일/데스크톱 최적화
+- **클릭**: Steam 게임은 Steam 스토어로, 기타 게임은 상세/공지 링크로 이동
+- **달력 이미지 저장**: html2canvas로 현재 달력 뷰를 PNG로 다운로드
+- **더보기(popover)**: 내부 칩도 메인과 동일한 스타일로 표시
 
 ## 🛠️ 기술 스택
 
 ### Frontend
-- **HTML5**: 시맨틱 마크업
-- **CSS3**: Bootstrap 5 + 커스텀 스타일
-- **JavaScript (ES6+)**: 바닐라 JS (모듈 없음)
-- **FullCalendar**: 달력 라이브러리
-- **Day.js**: 날짜/시간 처리
+- **HTML5**, **CSS3**(Bootstrap 5 + 커스텀), **JavaScript (ES6+)**
+- **FullCalendar**, **Day.js**, **html2canvas**
 
 ### Backend & Data
 - **정적 파일**: JSON 기반 데이터 저장
-- **Python**: Steam 데이터 스크래핑
-- **GitHub Actions**: 자동화된 데이터 업데이트
+- **Python**: Steam 데이터 스크래핑(`scripts/scrape_comingsoon.py`)
 
 ### 외부 서비스
-- **Steam API**: 게임 정보 및 헤더 이미지
-- **이미지 프록시**: CORS 우회 (r.jina.ai, images.weserv.nl)
+- **Steam API**: appdetails/스토어 태그
+- **이미지 프록시**: CORS 우회 (우선 `r.jina.ai`, 폴백 `images.weserv.nl`)
 - **GitHub Pages**: 정적 호스팅
 
 ## 📁 프로젝트 구조
@@ -62,38 +61,13 @@ subculture_news/
 │   ├── games.json          # 게임 메타데이터
 │   └── updates.json        # 업데이트 일정 데이터
 ├── assets/                 # 이미지 리소스
-│   ├── nikke.png
-│   ├── genshin.png
-│   ├── ww.png
-│   ├── star_rail.png
-│   ├── zzz.png
-│   ├── limbus.png
-│   ├── steam.png
-│   └── switch.png
+│   ├── nikke.png genshin.png ww.png star_rail.png zzz.png steam.png switch.png
 ├── scripts/
 │   └── scrape_comingsoon.py # Steam 데이터 스크래핑
 └── README.md               # 프로젝트 문서
 ```
 
-## 🎯 지원 게임
-
-### 모바일 게임
-- **승리의 여신: 니케** - 바이오하자드 콜라보 이벤트
-- **붕괴: 스타레일** - 버전 업데이트 및 픽업
-- **젠레스 존 제로** - 신규 캐릭터 픽업
-- **원신** - 버전 업데이트
-- **명조 (Wuthering Waves)** - 업데이트
-- **림버스 컴퍼니** - 업데이트
-
-### PC 게임 (Steam)
-- **인기 찜 목록** 기준 발매예정 게임들
-- 9-10월 발매예정 게임 중심
-- 한국어 지역화 정보 포함
-
-### 콘솔 게임 (Nintendo Switch)
-- **포켓몬 LEGENDS Z-A** - 2025년 10월 16일 발매예정
-
-## 🔧 데이터 구조
+## 🔧 데이터 구조 예시
 
 ### games.json
 ```json
@@ -109,9 +83,10 @@ subculture_news/
 {
   "game_id": "nikke",
   "version": "",
-  "update_date": "2025-09-24T00:00:00+09:00",
-  "end_date": "2025-09-24T07:00:00+09:00",
-  "description": "바이오하자드 콜라보 업데이트 · SSR 에이다 웡 픽업 시작"
+  "update_date": "2025-09-24",
+  "end_date": "2025-10-21",
+  "description": "시작일 : 9/24\n종료일 : 10/21\n[신규] 에이다 웡",
+  "url": "https://naver.me/Gq9bbVId"
 }
 ```
 
@@ -135,7 +110,7 @@ subculture_news/
 ### GitHub Pages
 - **URL**: https://lsh0407.github.io/subculture_news/
 - **자동 배포**: main 브랜치 푸시 시 자동 업데이트
-- **캐시**: 브라우저 새로고침 필요할 수 있음
+- **캐시**: 강력 캐시로 새로고침 필요할 수 있음
 
 ### 로컬 개발
 ```bash
@@ -159,65 +134,26 @@ npx serve .
 ```bash
 # 수동 실행
 python scripts/scrape_comingsoon.py
-
-# GitHub Actions (자동)
-# 매일 실행되어 최신 Steam 게임 정보 수집
+# 환경변수
+# TARGET_MONTHS=9,10,11,12 MAX_PAGES=10 python scripts/scrape_comingsoon.py
 ```
 
 ### 수동 이벤트 추가
-1. `data/updates.json` 파일 편집
-2. Git 커밋 및 푸시
-3. GitHub Pages 자동 배포
+1. `data/updates.json` 편집 (시작/종료/설명/링크)
+2. 커밋/푸시 → GitHub Pages 자동 반영
 
-## 🎨 UI/UX 특징
-
-### 달력 디자인
-- **Bootstrap 5** 기반 모던한 디자인
-- **반응형 그리드** 레이아웃
-- **커스텀 이벤트 칩** 스타일링
-- **툴팁** 상호작용
-
-### 색상 테마
-- **Primary**: Bootstrap Blue (#0d6efd)
-- **일관된 색상**: 모든 이벤트에 동일한 테마 적용
-- **접근성**: 충분한 대비와 가독성
-
-### 반응형 디자인
-- **모바일**: 터치 친화적 인터페이스
-- **태블릿**: 중간 크기 최적화
-- **데스크톱**: 전체 기능 활용
-
-## 🔍 주요 기능 상세
-
-### 필터링 시스템
-- **다중 선택**: 여러 게임 동시 선택 가능
-- **카테고리 그룹핑**: Steam/Switch 게임을 카테고리로 관리
-- **실시간 업데이트**: 필터 변경 시 즉시 달력 반영
-
-### 이미지 처리
-- **Steam 게임**: 프록시 서버를 통한 CORS 우회
-- **Switch 게임**: 직접 이미지 로드
-- **폴백 시스템**: 이미지 로딩 실패 시 대체 이미지
-
-### 성능 최적화
-- **지연 로딩**: 이미지 lazy loading
-- **캐싱**: 브라우저 캐시 활용
-- **압축**: 정적 파일 최적화
+## 🎨 UI/UX 가이드
+- **유형 색상**: 업데이트(파랑)·방송(황금)·신규발매(초록)·종료(빨강)
+- **정렬 규칙**: 동일 날짜 내 Steam/Switch 후순위
+- **툴팁**: 이미지 CORS 프록시 우선(`r.jina.ai`), 텍스트 줄바꿈 유지
+- **가독성**: 칩 텍스트 대비 보정(text-shadow), 셀 상단 여백 보정
+- **다운로드**: 설정 카드의 “달력 이미지 저장” 버튼으로 PNG 저장
+- **범례**: 제목 바 우측 색 점으로 의미 안내
 
 ## 📞 문의 및 지원
-
 - **Discord**: [문의하기](https://discord.com/channels/1402629632142086235/1420232300070965370)
 - **GitHub**: [이슈 리포트](https://github.com/lsh0407/subculture_news/issues)
 - **라이선스**: MIT
-
-## 🔮 향후 계획
-
-- [ ] 게임 상세 페이지 구현
-- [ ] 알림 기능 추가
-- [ ] 더 많은 플랫폼 지원 (PlayStation, Xbox)
-- [ ] 사용자 맞춤 설정 저장
-- [ ] 다국어 지원
-- [ ] PWA (Progressive Web App) 변환
 
 ---
 
