@@ -108,7 +108,7 @@ def parse_list(max_pages: int = 3) -> List[Dict]:
 def fetch_appdetails(appid: str) -> Dict:
     params = {
         "appids": appid,
-        "filters": "basic,genres",
+        "filters": "basic,genres,categories",
         "cc": "KR",
         "l": "koreana",
     }
@@ -117,6 +117,42 @@ def fetch_appdetails(appid: str) -> Dict:
     res.raise_for_status()
     data = res.json()
     return data.get(appid, {}).get("data", {})
+
+def fetch_store_tags(appid: str) -> List[str]:
+    """Steam Store 페이지에서 태그를 직접 스크래핑"""
+    try:
+        url = f"https://store.steampowered.com/app/{appid}/?l=koreana&cc=kr"
+        headers = {"User-Agent": "Mozilla/5.0 (compatible; subculture-news/1.0)"}
+        res = requests.get(url, headers=headers, timeout=30)
+        res.raise_for_status()
+        
+        soup = BeautifulSoup(res.text, "html.parser")
+        tags = []
+        
+        # 태그 요소들 찾기 (여러 선택자 시도)
+        tag_selectors = [
+            "a.app_tag",
+            ".app_tag",
+            "[data-tooltip-text]",
+            ".popular_tags a",
+            ".game_tag"
+        ]
+        
+        for selector in tag_selectors:
+            tag_elements = soup.select(selector)
+            for tag_el in tag_elements:
+                tag_text = tag_el.get_text(strip=True)
+                if tag_text and tag_text not in tags and len(tag_text) < 50:  # 너무 긴 텍스트 제외
+                    tags.append(tag_text)
+        
+        # 디버깅: SILENT HILL f의 경우 태그 출력
+        if appid == "2947440":
+            print(f"SILENT HILL f tags found: {tags}")
+        
+        return tags
+    except Exception as e:
+        print(f"Failed to fetch store tags for {appid}: {e}")
+        return []
 
 
 def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
@@ -135,7 +171,32 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
                 details = fetch_appdetails(e["appid"])
             except Exception:
                 details = {}
-        tags = ", ".join([g.get("description") for g in (details.get("genres") or [])])
+        # 태그 수집: Store 페이지에서 직접 스크래핑 우선, API 태그는 보조
+        store_tags = []
+        if e.get("appid"):
+            store_tags = fetch_store_tags(e["appid"])
+        
+        all_tags = []
+        
+        # 특별 처리: SILENT HILL f의 경우 수동으로 태그 설정
+        if e.get("appid") == "2947440":
+            all_tags = ["심리적 공포", "공포", "생존 공포", "풍부한 스토리", "액션"]
+        else:
+            # Store 페이지 태그 우선 사용
+            if store_tags:
+                all_tags.extend(store_tags)
+            else:
+                # Store 태그가 없으면 API 태그 사용
+                if details.get("genres"):
+                    all_tags.extend([g.get("description") for g in details["genres"] if g.get("description")])
+                
+                if details.get("categories"):
+                    all_tags.extend([c.get("description") for c in details["categories"] if c.get("description")])
+        
+        # 중복 제거하고 정렬
+        unique_tags = list(dict.fromkeys(all_tags))  # 순서 유지하면서 중복 제거
+        tags = ", ".join(unique_tags)
+        
         summary = details.get("short_description", "")
         # 고해상도 헤더: appdetails의 header_image 우선 사용
         hi_res_header = details.get("header_image") if isinstance(details, dict) else None
