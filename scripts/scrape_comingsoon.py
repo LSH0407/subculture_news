@@ -216,7 +216,7 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
 
 
 def main():
-    target_months = os.getenv("TARGET_MONTHS", "9,10")
+    target_months = os.getenv("TARGET_MONTHS", "9,10,11,12")
     months = [int(x) for x in target_months.split(",") if x.strip()]
     entries = parse_list(max_pages=int(os.getenv("MAX_PAGES", "3")))
     updates = to_updates(entries, months)

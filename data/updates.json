@@ -39,18 +39,6 @@
     "header_image": "<img src=\"https://data1.pokemonkorea.co.kr/newdata/2025/05/2025-05-28_21-40-03-98703-1748436003.jpg\" alt=\"\" class=\"d-lg-none d-block w-100\">"
   },
   {
-    "game_id": "steam_2106150",
-    "version": "",
-    "update_date": "2025-09-03",
-    "description": "발매예정 ·  · 미표기",
-    "name": "琉奈と悪夢の館",
-    "url": "https://store.steampowered.com/app/2106150/_/?snr=1_7_7_popularcomingsoon_150_1",
-    "platform": "steam",
-    "tags": "어드벤처, 귀여운, 탐험, 공포, 여주인공, 2D, 복수 결말, 고딕, 싱글 플레이어, 포인트 앤드 클릭, 분위기 있는, 선정적 콘텐츠, 헨타이, 폭력, 인디, 애니메이션, 고어, 누드, +, X, Discord, 찜 목록에 추가, (?)",
-    "summary": "불운한 소녀 &quot;이치야 루나&quot;는, 어느 날 섬뜩한 풍경의 양옥에서 눈을 뜨게 된다.",
-    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2106150/header_koreana.jpg?t=1738820015"
-  },
-  {
     "game_id": "steam_1281640",
     "version": "",
     "update_date": "2025-09-03",
@@ -344,7 +332,7 @@
     "update_date": "2025-10-06",
     "description": "발매예정 ·  · 미표기",
     "name": "CARIMARA: Beneath the forlorn limbs",
-    "url": "https://store.steampowered.com/app/3570370/CARIMARA_Beneath_the_forlorn_limbs/?snr=1_7_7_popularcomingsoon_150_2",
+    "url": "https://store.steampowered.com/app/3570370/CARIMARA_Beneath_the_forlorn_limbs/?snr=1_7_7_popularcomingsoon_150_1",
     "platform": "steam",
     "tags": "카드 게임, 풍부한 스토리, 어드벤처, 탐험, 미스터리, 공포, 선택의 중요성, 분위기 있는, 3D, 인디, 1인칭, 추리, 실험적, 어두운, 초현실적, 시네마틱, 퍼즐, 싱글 플레이어, 블랙 유머, LGBTQ+, +, Bluesky, X, 찜 목록에 추가, (?)",
     "summary": "외래의 마법을 품은 말 없는 작은 이여. 집은 되려 속삭여온다. 물음을 그르치면, 그대의 이름을 기억하는 이가 깨어날지니.",
@@ -471,18 +459,6 @@
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3214530/header.jpg?t=1758520510"
   },
   {
-    "game_id": "steam_1392860",
-    "version": "",
-    "update_date": "2025-10-09",
-    "description": "발매예정 ·  · 미표기",
-    "name": "리틀 나이트메어 3",
-    "url": "https://store.steampowered.com/app/1392860/__3/?snr=1_7_7_popularcomingsoon_150_2",
-    "platform": "steam",
-    "tags": "어드벤처, 공포, 협동, 퍼즐, 멀티플레이어, 분위기 있는, 온라인 협동, 플랫폼, 싱글 플레이어, 협동 캠페인, 심리적 공포, 어두운, 액션, 잠입, 풍부한 스토리, 2.5D, 탐험, 인디, 웅장한 사운드트랙, 로컬 협동, +, 계정에 추가, (?)",
-    "summary": "『리틀 나이트메어』의 독특한 세계관 속에서 새로운 모험을 떠나 보세요. 『리틀 나이트메어 3』에서 여러분은 로우와 얼론의 여정에 동참하고 Nowhere 바깥으로 나가는 길을 찾아내야 합니다. 친구와 온라인에서 협력하거나 혼자라도 AI를 동료로 맞이하여 어린 시절의 공포에 함께 마주하세요.",
-    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1392860/2dc787177fc5c08b24a6022bbd353047e9791af0/header_koreana.jpg?t=1758186235"
-  },
-  {
     "game_id": "steam_2088783",
     "version": "",
     "update_date": "2025-10-09",
@@ -529,6 +505,18 @@
     "tags": "어드벤처, 공포, 협동, 퍼즐, 멀티플레이어, 분위기 있는, 온라인 협동, 플랫폼, 싱글 플레이어, 협동 캠페인, 심리적 공포, 어두운, 액션, 잠입, 2.5D, 풍부한 스토리, 탐험, 웅장한 사운드트랙, 인디, 로컬 협동, +, 계정에 추가, (?)",
     "summary": "확장 패스에서 나선의 기괴한 섬을 깊게 탐구해 보세요. 숨겨진 비밀이 밝혀지는 2개의 추가 챕터를 플레이하실 수 있습니다. 또한, 로우와 얼론 둘 다 입을 수 있는, 존재하지 않는 곳의 여느 아이들 같은 친숙한 모습인 뱃사공의 의상도 얻으실 수 있습니다.",
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2170190/abb598d650bf5738cf139a2d2acaad69c780bc46/header_koreana.jpg?t=1758186399"
+  },
+  {
+    "game_id": "steam_1392860",
+    "version": "",
+    "update_date": "2025-10-09",
+    "description": "발매예정 ·  · 미표기",
+    "name": "리틀 나이트메어 3",
+    "url": "https://store.steampowered.com/app/1392860/__3/?snr=1_7_7_popularcomingsoon_150_2",
+    "platform": "steam",
+    "tags": "어드벤처, 공포, 협동, 퍼즐, 멀티플레이어, 분위기 있는, 온라인 협동, 플랫폼, 싱글 플레이어, 협동 캠페인, 심리적 공포, 어두운, 액션, 잠입, 풍부한 스토리, 2.5D, 탐험, 인디, 웅장한 사운드트랙, 로컬 협동, +, 계정에 추가, (?)",
+    "summary": "『리틀 나이트메어』의 독특한 세계관 속에서 새로운 모험을 떠나 보세요. 『리틀 나이트메어 3』에서 여러분은 로우와 얼론의 여정에 동참하고 Nowhere 바깥으로 나가는 길을 찾아내야 합니다. 친구와 온라인에서 협력하거나 혼자라도 AI를 동료로 맞이하여 어린 시절의 공포에 함께 마주하세요.",
+    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1392860/2dc787177fc5c08b24a6022bbd353047e9791af0/header_koreana.jpg?t=1758186235"
   },
   {
     "game_id": "steam_3561230",
@@ -644,7 +632,7 @@
     "update_date": "2025-10-17",
     "description": "발매예정 ·  · 미표기",
     "name": "Keeper",
-    "url": "https://store.steampowered.com/app/3043580/Keeper/?snr=1_7_7_popularcomingsoon_150_3",
+    "url": "https://store.steampowered.com/app/3043580/Keeper/?snr=1_7_7_popularcomingsoon_150_2",
     "platform": "steam",
     "tags": "어드벤처, 분위기 있는, 시네마틱, 사이키델릭, 퍼즐, 3인칭, 초현실적, 풍부한 스토리, 탐험, 다채로운, 양식화된, 판타지, 철학적, 미스터리, 자연, 싱글 플레이어, 3D, 선형, +, Discord, Bluesky, Instagram, Threads, YouTube, 찜 목록에 추가, (?)",
     "summary": "Lee Petty와 Double Fine Productions가 선보이는 Keeper는 말없이 펼쳐지는 한 편의 이야기입니다. 오래도록 잊혔던 등대가 어느 날 깨어나고, 신비로운 바닷새와 함께 불현듯 찾아온 우정을 나누며 따스한 이야기가 시작됩니다. 그리고 이들은 이해를 넘어선 세계로 뜻하지 않은 여정을 떠나게 됩니다.",
@@ -699,18 +687,6 @@
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3352310/5a335989e8937d2dfe6f805419061f12229cb3e2/header.jpg?t=1757160331"
   },
   {
-    "game_id": "steam_532790",
-    "version": "",
-    "update_date": "2025-10-21",
-    "description": "발매예정 ·  · 미표기",
-    "name": "Vampire: The Masquerade® - Bloodlines™ 2",
-    "url": "https://store.steampowered.com/app/532790/Vampire_The_Masquerade__Bloodlines_2/?snr=1_7_7_popularcomingsoon_150_3",
-    "platform": "steam",
-    "tags": "액션, RPG, 싱글 플레이어, Steam 도전 과제, 텍스트 크기 조절, 난이도 조정, 자막 옵션, 컨트롤러 일부 지원, Steam Cloud, 가족 공유",
-    "summary": "엘더 뱀파이어가 되어 전쟁의 긴장감이 감도는 현대 시애틀을 누비세요. 막강한 영향력을 지닌 인물들을 만나고, 동맹을 맺고, 지배자와 도시의 새로운 모습을 내 손으로 정하세요.",
-    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/532790/6d111b2adddf94a3689dab8d7642de40b051db42/header.jpg?t=1758124987"
-  },
-  {
     "game_id": "steam_3528280",
     "version": "",
     "update_date": "2025-10-21",
@@ -721,6 +697,18 @@
     "tags": "심리적 공포, 추리, 공포, 어드벤처, 현실적, 어두운, 캐주얼, 스릴러, 3D, 1인칭, 1990년대, 분위기 있는, 미스터리, 감정적인, 풍부한 스토리, 선형, 싱글 플레이어, 수사, 올드 스쿨, 인디, +, Discord, X, Bluesky, 찜 목록에 추가, (?)",
     "summary": "가택 연금 중인 코디 하퍼는 지루함에 이웃을 관찰한다. 그러나 그 무해한 오락은 악몽으로 변한다. 실제 연쇄 살인마의 이야기를 바탕으로 한 공포.",
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3528280/1ab5630840ab5d3b9314aaa59dbf1ee92c84e9e1/header.jpg?t=1758549874"
+  },
+  {
+    "game_id": "steam_532790",
+    "version": "",
+    "update_date": "2025-10-21",
+    "description": "발매예정 ·  · 미표기",
+    "name": "Vampire: The Masquerade® - Bloodlines™ 2",
+    "url": "https://store.steampowered.com/app/532790/Vampire_The_Masquerade__Bloodlines_2/?snr=1_7_7_popularcomingsoon_150_3",
+    "platform": "steam",
+    "tags": "액션, RPG, 싱글 플레이어, Steam 도전 과제, 텍스트 크기 조절, 난이도 조정, 자막 옵션, 컨트롤러 일부 지원, Steam Cloud, 가족 공유",
+    "summary": "엘더 뱀파이어가 되어 전쟁의 긴장감이 감도는 현대 시애틀을 누비세요. 막강한 영향력을 지닌 인물들을 만나고, 동맹을 맺고, 지배자와 도시의 새로운 모습을 내 손으로 정하세요.",
+    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/532790/6d111b2adddf94a3689dab8d7642de40b051db42/header.jpg?t=1758124987"
   },
   {
     "game_id": "steam_3419290",
@@ -759,18 +747,6 @@
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2779120/header.jpg?t=1758103425"
   },
   {
-    "game_id": "steam_3012220",
-    "version": "",
-    "update_date": "2025-10-23",
-    "description": "발매예정 ·  · 미표기",
-    "name": "더블 드래곤 리바이브",
-    "url": "https://store.steampowered.com/app/3012220/_/?snr=1_7_7_popularcomingsoon_150_3",
-    "platform": "steam",
-    "tags": "액션, 아케이드, 비뎀업, 2D 플랫폼, 스펙터클 파이터, 3D, 현실적, 시네마틱, 1980년대, 탑다운, 아메리카, 반이상향, 용, 농구, 파쿠르, 전쟁, 무술, PvE, 스코어 어택, 멀티플레이어, +, (?)",
-    "summary": "전 세계가 열광했던 &quot;더블 드래곤&quot;이 지금 부활한다!",
-    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3012220/header.jpg?t=1750998823"
-  },
-  {
     "game_id": "steam_3696410",
     "version": "",
     "update_date": "2025-10-23",
@@ -781,6 +757,18 @@
     "tags": "액션, 3인칭 슈팅, 슈팅, 여주인공, 공상과학, 귀여운, 액션 로그라이크, 3D, 폭력, 고어, PvE, 싱글 플레이어, +, X, YouTube, 찜 목록에 추가, (?)",
     "summary": "전신 금속 갑옷을 입은 여학생이 착취적인 기업을 파괴한다! (...라이브 스트리밍 중)",
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3696410/2f51c71984e8968695a75f0fe81731bec606c7db/header.jpg?t=1758678086"
+  },
+  {
+    "game_id": "steam_3012220",
+    "version": "",
+    "update_date": "2025-10-23",
+    "description": "발매예정 ·  · 미표기",
+    "name": "더블 드래곤 리바이브",
+    "url": "https://store.steampowered.com/app/3012220/_/?snr=1_7_7_popularcomingsoon_150_3",
+    "platform": "steam",
+    "tags": "액션, 아케이드, 비뎀업, 2D 플랫폼, 스펙터클 파이터, 3D, 현실적, 시네마틱, 1980년대, 탑다운, 아메리카, 반이상향, 용, 농구, 파쿠르, 전쟁, 무술, PvE, 스코어 어택, 멀티플레이어, +, (?)",
+    "summary": "전 세계가 열광했던 &quot;더블 드래곤&quot;이 지금 부활한다!",
+    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3012220/header.jpg?t=1750998823"
   },
   {
     "game_id": "steam_3128220",
@@ -795,16 +783,16 @@
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3128220/67be23ea32b59096e29639694466478c9c5818f0/header_alt_assets_0.jpg?t=1757853755"
   },
   {
-    "game_id": "steam_1497430",
+    "game_id": "steam_3672960",
     "version": "",
     "update_date": "2025-10-23",
     "description": "발매예정 ·  · 미표기",
-    "name": "Bounty Star",
-    "url": "https://store.steampowered.com/app/1497430/Bounty_Star/?snr=1_7_7_popularcomingsoon_150_3",
+    "name": "House Flipper 2 - Scooby-Doo DLC",
+    "url": "https://store.steampowered.com/app/3672960/House_Flipper_2__ScoobyDoo_DLC/?snr=1_7_7_popularcomingsoon_150_3",
     "platform": "steam",
-    "tags": "어드벤처, 액션 어드벤처, 매크, 3인칭, 판타지, 액션, 포스트아포칼립스, 핵 앤 슬래시, 여주인공, 캐릭터 커스터마이즈, 전투, 컨트롤러, 싱글 플레이어, 3D, 폭력, 기지 건설, 로봇, 웨스턴, +, 찜 목록에 추가, (?)",
-    "summary": "Bounty Star 은(는) 메크 전투 및 커스터마이제이션, 농업, 기지 건설을 결합한 오버더숄더 3D 액션 게임입니다. 희망을 잃은 참전 용사이자 재능 있는 전사 겸 전문 메크 조종사인 클렘이라는 뛰어난 전직 군인이 되어 플레이하세요.",
-    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1497430/3f3b158144874d102626737c5da0aa79cbc1f11c/header.jpg?t=1758567950"
+    "tags": "시뮬레이션, 캐주얼, 릴랙싱, 건설, 협동, 디자인 및 일러스트레이션, 전체 이용가, 리플레이 가치, 샌드박스, 파괴, 온라인 협동, 다채로운, 몰입형 시뮬레이션, 3D, 싱글 플레이어, 인디, 기지 건설, 1인칭, 교육, 현실적, +, Discord, X, YouTube, Twitch, TikTok, 찜 목록에 추가, (?)",
+    "summary": "피나코브에 여러분의 도움이 필요합니다! 늘 평화로웠던 마을에 초자연적 현상이 일어나고 있습니다. 플리핑으로 이 난장판을 청소해 주세요! 다행스럽게도 여러분은 혼자가 아닙니다. 스쿠비, 섀기, 그리고 미스터리 주식회사 갱단과 함께 단서를 찾고 오랜 미스터리를 밝혀내세요.",
+    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3672960/37536125f2d16361d07b697e66746b4762a89f98/header.jpg?t=1757925520"
   },
   {
     "game_id": "steam_1919900",
@@ -819,16 +807,16 @@
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1919900/header.jpg?t=1758268699"
   },
   {
-    "game_id": "steam_3672960",
+    "game_id": "steam_1497430",
     "version": "",
     "update_date": "2025-10-23",
     "description": "발매예정 ·  · 미표기",
-    "name": "House Flipper 2 - Scooby-Doo DLC",
-    "url": "https://store.steampowered.com/app/3672960/House_Flipper_2__ScoobyDoo_DLC/?snr=1_7_7_popularcomingsoon_150_3",
+    "name": "Bounty Star",
+    "url": "https://store.steampowered.com/app/1497430/Bounty_Star/?snr=1_7_7_popularcomingsoon_150_3",
     "platform": "steam",
-    "tags": "시뮬레이션, 캐주얼, 릴랙싱, 건설, 협동, 디자인 및 일러스트레이션, 전체 이용가, 리플레이 가치, 샌드박스, 파괴, 온라인 협동, 다채로운, 몰입형 시뮬레이션, 3D, 싱글 플레이어, 인디, 기지 건설, 1인칭, 교육, 현실적, +, Discord, X, YouTube, Twitch, TikTok, 찜 목록에 추가, (?)",
-    "summary": "피나코브에 여러분의 도움이 필요합니다! 늘 평화로웠던 마을에 초자연적 현상이 일어나고 있습니다. 플리핑으로 이 난장판을 청소해 주세요! 다행스럽게도 여러분은 혼자가 아닙니다. 스쿠비, 섀기, 그리고 미스터리 주식회사 갱단과 함께 단서를 찾고 오랜 미스터리를 밝혀내세요.",
-    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3672960/37536125f2d16361d07b697e66746b4762a89f98/header.jpg?t=1757925520"
+    "tags": "어드벤처, 액션 어드벤처, 매크, 3인칭, 판타지, 액션, 포스트아포칼립스, 핵 앤 슬래시, 여주인공, 캐릭터 커스터마이즈, 전투, 컨트롤러, 싱글 플레이어, 3D, 폭력, 기지 건설, 로봇, 웨스턴, +, 찜 목록에 추가, (?)",
+    "summary": "Bounty Star 은(는) 메크 전투 및 커스터마이제이션, 농업, 기지 건설을 결합한 오버더숄더 3D 액션 게임입니다. 희망을 잃은 참전 용사이자 재능 있는 전사 겸 전문 메크 조종사인 클렘이라는 뛰어난 전직 군인이 되어 플레이하세요.",
+    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1497430/3f3b158144874d102626737c5da0aa79cbc1f11c/header.jpg?t=1758567950"
   },
   {
     "game_id": "steam_2464280",
@@ -937,5 +925,17 @@
     "tags": "시뮬레이션, 경영, 경제, 자본주의, 몰입형 시뮬레이션, 생활 시뮬레이션, 거래, 자원관리, 1인칭, 캐주얼, 건설, 인벤토리 관리, 샌드박스, 릴랙싱, 도시 건설, 싱글 플레이어, 3D, 현실적, 앞서 해보기, 인디, +, Discord, 찜 목록에 추가, (?)",
     "summary": "귀하의 매장을 작은 쇼핑 센터에서 대형 시티 몰로 변신시키세요! 파산을 피하려면 새로운 매장 계약을 협상하고, 좋은 가격을 설정하며, 트렌드를 따라가야 합니다. 상층, 청소, 절도범 및 보안이 곧 다가옵니다.",
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3180150/efeb42fda0141a9739226e7f904483ced4f5c67b/header_koreana.jpg?t=1757940349"
+  },
+  {
+    "game_id": "steam_1939890",
+    "version": "",
+    "update_date": "2025-10-28",
+    "description": "발매예정 ·  · 미표기",
+    "name": "Simon the Sorcerer Origins",
+    "url": "https://store.steampowered.com/app/1939890/Simon_the_Sorcerer_Origins/?snr=1_7_7_popularcomingsoon_150_3",
+    "platform": "steam",
+    "tags": "어드벤처, 포인트 앤드 클릭, 퍼즐, 2D, 1990년대, 분위기 있는, 코미디, 유머, 풍부한 스토리, 싱글 플레이어, 내러티브, 판타지, 마법, 전체 이용가, 손으로 그린, 다채로운, 컨트롤러, FMV, 탐험, 만화, +, X, Instagram, 찜 목록에 추가, (?)",
+    "summary": "Simon the Sorcerer Origins는 유명 포인트 앤 클릭 어드벤처 시리즈의 공식 프리퀄입니다. 마법세계로 돌아와 비디오 게임계에서 가장 시니컬한 마법사의 뒷 이야기를 알아보세요!",
+    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1939890/affa4a9bfd62abd2347d7c167eadf26a4d33258a/header.jpg?t=1758628237"
   }
 ]
