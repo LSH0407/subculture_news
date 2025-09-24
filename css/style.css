@@ -173,6 +173,7 @@ body {
 }
 .tooltip-summary {
     color: #e9ecef;
+    white-space: pre-line; /* \n 줄바꿈 유지하여 한 줄씩 보이도록 */
 }
 .tooltip-header { margin: 6px 0 8px; }
 .tooltip-header img { width: 100%; height: auto; display: block; border-radius: 6px; }
