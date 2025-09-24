@@ -653,10 +653,21 @@ function setupCalendar(gameMap) {
                     headerImg = `<div class=\"tooltip-header\"><img src=\"${first}\" alt=\"header\" loading=\"lazy\" referrerpolicy=\"no-referrer\" crossorigin=\"anonymous\" onerror=\"(function(img){try{var c=img.dataset.candidates?JSON.parse(img.dataset.candidates):[];var next=c.shift();if(next){img.dataset.candidates=JSON.stringify(c);img.src=next;} }catch(e){} })(this)\" data-candidates=\"${dataCandidates}\"></div>`;
                 }
             }
+            // 가격 표시: price가 없으면 description의 마지막 세그먼트에서 추출(… · 가격)
+            let priceLine = '';
+            if (ex.price && String(ex.price).trim()) {
+                priceLine = `가격: ${ex.price}`;
+            } else if (ex.description && ex.description.includes('·')) {
+                const segs = ex.description.split('·').map(s => s.trim());
+                const last = segs[segs.length - 1] || '';
+                if (/[₩￦]|원|미표기/.test(last)) priceLine = `가격: ${last}`;
+            }
+
             const desc = `
                 <div class=\"tooltip-title\">${fullTitle}</div>
                 ${headerImg}
                 ${tagLine ? `<div class=\"tooltip-tags\">${tagLine}</div>` : ''}
+                ${priceLine ? `<div class=\"tooltip-tags\">${priceLine}</div>` : ''}
                 ${gameInfo ? `<div class=\"tooltip-summary\">${gameInfo}</div>` : ''}
             `;
             const tooltip = document.createElement('div');
