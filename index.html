@@ -20,6 +20,29 @@
     <main class="container my-4">
         <section id="stats" class="mb-3 small text-secondary"></section>
         
+        <!-- 설정 섹션 -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">설정</h6>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <label for="eventLimit" class="form-label mb-0">하루 최대 이벤트 수:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select id="eventLimit" class="form-select form-select-sm" style="width: auto;">
+                            <option value="5">5개</option>
+                            <option value="10" selected>10개</option>
+                            <option value="15">15개</option>
+                            <option value="20">20개</option>
+                            <option value="false">제한 없음</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 게임 필터 섹션 -->
         <div class="card mb-3">
             <div class="card-header">

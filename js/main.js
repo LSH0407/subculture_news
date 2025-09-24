@@ -5,6 +5,7 @@ const state = {
     updates: [],
     calendar: null,
     selectedGames: new Set(), // 선택된 게임 ID들을 저장
+    eventLimit: 10, // 하루 최대 이벤트 수
 };
 
 async function fetchJson(path) {
@@ -208,6 +209,12 @@ function createGameCheckbox(gameId, gameName, thumbnail) {
 }
 
 function bindControls(updateView) {
+    // 이벤트 제한 설정 변경 이벤트
+    const eventLimitSelect = document.getElementById('eventLimit');
+    if (eventLimitSelect) {
+        eventLimitSelect.addEventListener('change', updateEventLimit);
+    }
+    
     // 게임 필터 체크박스 이벤트
     const gameFilter = document.getElementById('gameFilter');
     if (gameFilter) {
@@ -389,7 +396,7 @@ function setupCalendar(gameMap) {
         },
         dayMaxEventRows: 10, // 최대 10개 행까지 표시
         moreLinkClick: 'popover',
-        dayMaxEvents: 10, // 하루에 최대 10개 이벤트 표시
+        dayMaxEvents: () => state.eventLimit, // 동적으로 이벤트 제한 적용
         height: 'auto', // 높이 자동 조정
         eventDisplay: 'block', // 이벤트를 블록으로 표시
         showNonCurrentDates: true, // 이전/다음 달 날짜들도 표시
@@ -550,6 +557,21 @@ function renderCalendarEvents(filtered, gameMap) {
 
 function getThemeColor() {
     return '#0d6efd';
+}
+
+function updateEventLimit() {
+    const eventLimitSelect = document.getElementById('eventLimit');
+    if (eventLimitSelect) {
+        const value = eventLimitSelect.value;
+        state.eventLimit = value === 'false' ? false : parseInt(value);
+        
+        // 달력 설정 업데이트
+        if (state.calendar) {
+            state.calendar.setOption('dayMaxEvents', state.eventLimit);
+        }
+        
+        console.log('Event limit updated to:', state.eventLimit);
+    }
 }
 
 function updateView() {
