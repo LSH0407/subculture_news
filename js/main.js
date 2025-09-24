@@ -391,6 +391,8 @@ function toCalendarEvents(updates, gameMap) {
                    const srcMatch = headerImage.match(/src="([^"]+)"/);
                    if (srcMatch) {
                        headerImage = srcMatch[1];
+                       // Switch 게임은 프록시 없이 직접 사용
+                       headerCandidates = [];
                    }
                }
         
@@ -505,30 +507,40 @@ function setupCalendar(gameMap) {
             
             let headerImg = '';
             if (ex.headerImage) {
-                const buildProxyVariants = (url) => {
-                    const variants = [];
-                    const u = String(url);
-                    // 원본
-                    variants.push(u);
-                    // r.jina.ai 프록시 (원본 품질 유지)
-                    variants.push(`https://r.jina.ai/http/${u.replace(/^https?:\/\//,'')}`);
-                    // weserv 고품질 설정
-                    const clean = u.replace(/^https?:\/\//, '');
-                    variants.push(`https://images.weserv.nl/?url=${encodeURIComponent(clean)}&q=100`);
-                    return variants;
-                };
-                // 메인 이미지 + 후보들을 모두 프록시 변형 포함으로 전개
-                let candidates = buildProxyVariants(ex.headerImage);
-                if (Array.isArray(ex.headerCandidates)) {
-                    for (const c of ex.headerCandidates) {
-                        candidates = candidates.concat(buildProxyVariants(c));
-                    }
+                // 디버깅: Switch 게임 이미지 확인
+                if (ex.platform === 'switch') {
+                    console.log('Switch game header image:', ex.headerImage);
                 }
-                // 중복 제거
-                candidates = Array.from(new Set(candidates));
-                const first = candidates.shift();
-                const dataCandidates = candidates.length ? String(JSON.stringify(candidates)).replace(/\"/g,'\\"') : '[]';
-                headerImg = `<div class=\"tooltip-header\"><img src=\"${first}\" alt=\"header\" loading=\"lazy\" referrerpolicy=\"no-referrer\" crossorigin=\"anonymous\" onerror=\"(function(img){try{var c=img.dataset.candidates?JSON.parse(img.dataset.candidates):[];var next=c.shift();if(next){img.dataset.candidates=JSON.stringify(c);img.src=next;} }catch(e){} })(this)\" data-candidates=\"${dataCandidates}\"></div>`;
+                if (ex.platform === 'switch') {
+                    // Switch 게임: 직접 이미지 로드 (프록시 없음)
+                    headerImg = `<div class=\"tooltip-header\"><img src=\"${ex.headerImage}\" alt=\"header\" loading=\"lazy\" referrerpolicy=\"no-referrer\" crossorigin=\"anonymous\"></div>`;
+                } else {
+                    // Steam 게임: 프록시 사용
+                    const buildProxyVariants = (url) => {
+                        const variants = [];
+                        const u = String(url);
+                        // 원본
+                        variants.push(u);
+                        // r.jina.ai 프록시 (원본 품질 유지)
+                        variants.push(`https://r.jina.ai/http/${u.replace(/^https?:\/\//,'')}`);
+                        // weserv 고품질 설정
+                        const clean = u.replace(/^https?:\/\//, '');
+                        variants.push(`https://images.weserv.nl/?url=${encodeURIComponent(clean)}&q=100`);
+                        return variants;
+                    };
+                    // 메인 이미지 + 후보들을 모두 프록시 변형 포함으로 전개
+                    let candidates = buildProxyVariants(ex.headerImage);
+                    if (Array.isArray(ex.headerCandidates)) {
+                        for (const c of ex.headerCandidates) {
+                            candidates = candidates.concat(buildProxyVariants(c));
+                        }
+                    }
+                    // 중복 제거
+                    candidates = Array.from(new Set(candidates));
+                    const first = candidates.shift();
+                    const dataCandidates = candidates.length ? String(JSON.stringify(candidates)).replace(/\"/g,'\\"') : '[]';
+                    headerImg = `<div class=\"tooltip-header\"><img src=\"${first}\" alt=\"header\" loading=\"lazy\" referrerpolicy=\"no-referrer\" crossorigin=\"anonymous\" onerror=\"(function(img){try{var c=img.dataset.candidates?JSON.parse(img.dataset.candidates):[];var next=c.shift();if(next){img.dataset.candidates=JSON.stringify(c);img.src=next;} }catch(e){} })(this)\" data-candidates=\"${dataCandidates}\"></div>`;
+                }
             }
             const desc = `
                 <div class=\"tooltip-title\">${fullTitle}</div>
