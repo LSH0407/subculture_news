@@ -288,6 +288,33 @@ function bindControls(updateView) {
             updateView();
         });
     }
+
+    // 달력 이미지 저장
+    const downloadBtn = document.getElementById('downloadCalendar');
+    if (downloadBtn && window.html2canvas) {
+        downloadBtn.addEventListener('click', async () => {
+            try {
+                const cal = document.getElementById('calendar');
+                if (!cal) return;
+                // FullCalendar 내부 스크롤을 고려하여 현재 보이는 달력 영역을 캡처
+                const canvas = await window.html2canvas(cal, {
+                    backgroundColor: '#ffffff',
+                    useCORS: true,
+                    scale: window.devicePixelRatio || 2,
+                });
+                const url = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                const ym = dayjs(state.calendar?.getDate()).format('YYYY-MM');
+                a.href = url;
+                a.download = `subculture-calendar-${ym}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (e) {
+                console.error('달력 저장 실패:', e);
+            }
+        });
+    }
 }
 
 async function init() {
@@ -470,6 +497,16 @@ function setupCalendar(gameMap) {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,listMonth'
+        },
+        // 이벤트 정렬: 기본적으로 시간순, 동일 시간일 때 플랫폼 우선순위 (모바일/고정 게임 우선, Steam/Switch 후순위)
+        eventOrder: (a, b) => {
+            const pa = (a.extendedProps?.platform || '').toLowerCase();
+            const pb = (b.extendedProps?.platform || '').toLowerCase();
+            const weight = (p) => (p === 'steam' || p === 'switch') ? 1 : 0; // 1이면 후순위
+            const dw = weight(pa) - weight(pb);
+            if (dw !== 0) return dw; // Steam/Switch를 뒤로
+            // 같으면 제목 사전순
+            return (a.title || '').localeCompare(b.title || '');
         },
         dayMaxEventRows: 10, // 최대 10개 행까지 표시
         moreLinkClick: 'popover',
