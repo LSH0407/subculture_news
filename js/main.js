@@ -415,7 +415,10 @@ function toCalendarEvents(updates, gameMap) {
 
         const isTimed = typeof u.update_date === 'string' && u.update_date.includes('T');
 
-        if (u.end_date && String(u.end_date) !== String(u.update_date)) {
+        // 날짜가 다른 범위일 때만 시작/종료로 분해 (같은 날 범위는 단일 이벤트로 처리)
+        const startDateOnly = (u.update_date || '').toString().slice(0, 10);
+        const endDateOnly = (u.end_date || '').toString().slice(0, 10);
+        if (u.end_date && endDateOnly && startDateOnly && endDateOnly !== startDateOnly) {
             // 시작일 이벤트 (단일)
             events.push({
                 title,
@@ -441,6 +444,7 @@ function toCalendarEvents(updates, gameMap) {
             events.push({
                 title,
                 start: u.update_date,
+                end: undefined, // 막대 표시 방지
                 allDay: !isTimed,
                 backgroundColor: getThemeColor(),
                 borderColor: getThemeColor(),
@@ -541,8 +545,10 @@ function setupCalendar(gameMap) {
                     console.log('Switch game header image:', ex.headerImage);
                 }
                 if (ex.platform === 'switch') {
-                    // Switch 게임: 직접 이미지 로드 (프록시 없음)
-                    headerImg = `<div class=\"tooltip-header\"><img src=\"${ex.headerImage}\" alt=\"header\" loading=\"lazy\" referrerpolicy=\"no-referrer\" crossorigin=\"anonymous\"></div>`;
+                    // Switch 게임: CORS 회피 위해 프록시 우선 시도 후 원본
+                    const raw = ex.headerImage;
+                    const proxied = `https://r.jina.ai/http/${String(raw).replace(/^https?:\/\//,'')}`;
+                    headerImg = `<div class=\"tooltip-header\"><img src=\"${proxied}\" data-fallback=\"${raw}\" alt=\"header\" loading=\"lazy\" onerror=\"this.onerror=null; this.src=this.dataset.fallback;\"></div>`;
                 } else {
                     // Steam 게임: 프록시 사용
                     const buildProxyVariants = (url) => {
