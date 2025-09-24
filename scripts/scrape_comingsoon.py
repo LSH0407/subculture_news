@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from typing import List, Dict
 
 import requests
@@ -216,8 +217,10 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
 
 
 def main():
-    target_months = os.getenv("TARGET_MONTHS", "9,10,11,12")
-    months = [int(x) for x in target_months.split(",") if x.strip()]
+    # 당일 기준 롤링 개월 수 계산 (기본 3개월)
+    rolling = int(os.getenv("ROLLING_MONTHS", "3"))
+    now = datetime.utcnow()
+    months = [(now + relativedelta(months=i)).month for i in range(max(1, rolling))]
     entries = parse_list(max_pages=int(os.getenv("MAX_PAGES", "10")))
     updates = to_updates(entries, months)
     updates.sort(key=lambda x: x["update_date"])
@@ -246,7 +249,7 @@ def main():
     with open(updates_path, "w", encoding="utf-8") as f:
         json.dump(merged, f, ensure_ascii=False, indent=2)
 
-    print(f"Wrote {len(updates)} upcoming coming-soon entries for months={months}")
+    print(f"Wrote {len(updates)} upcoming coming-soon entries for months={months} (rolling={rolling})")
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ jobs:
 
       - name: Run scraper
         env:
-          TARGET_MONTHS: '9,10,11,12'   # 3개월+ 범위 (필요시 환경변수로 조정)
+          ROLLING_MONTHS: '3'           # 당일 기준 앞으로 3개월
           MAX_PAGES: '10'               # 더 깊게 탐색
         run: |
           python scripts/scrape_comingsoon.py
