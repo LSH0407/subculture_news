@@ -28,7 +28,7 @@
   },
   {
     "game_id": "switch_pokemon_za",
-    "name": "포켓몬 LEGENDS Z-A",
+    "name": "포켓몬스터 LEGENDS Z-A",
     "version": "",
     "update_date": "2025-10-16",
     "description": "발매예정 · RPG · 65,000원",
@@ -37,6 +37,94 @@
     "tags": "RPG, 어드벤처, 포켓몬, 메가진화, 오픈월드",
     "summary": "「포켓몬스터」 시리즈의 새로운 도전작\n인간과 포켓몬이 공존하는 도시를 목표로 도시 재개발이 진행 중인 「미르시티」를 무대로 하는 새로운 모험이 시작됩니다!",
     "header_image": "<img src=\"https://data1.pokemonkorea.co.kr/newdata/2025/05/2025-05-28_21-40-03-98703-1748436003.jpg\" alt=\"\" class=\"d-lg-none d-block w-100\">"
+  },
+  {
+    "game_id": "switch_kirby_air_rider",
+    "name": "커비의 에어라이더",
+    "version": "",
+    "update_date": "2025-11-20",
+    "description": "발매예정 · 레이싱 · 미표기",
+    "platform": "switch",
+    "url": "https://www.nintendo.com/kr/games/switch2/lineup/index.html",
+    "tags": "레이싱, 액션, 멀티플레이어, 패밀리",
+    "summary": "커비 시리즈의 레이싱 작품. 다양한 코스에서 커비와 친구들과 경주를 즐길 수 있습니다."
+  },
+  {
+    "game_id": "switch_zelda_musou_sealed",
+    "name": "젤다무쌍 봉인 전기",
+    "version": "",
+    "update_date": "2025-11-06",
+    "description": "발매예정 · 액션 · 미표기",
+    "platform": "switch",
+    "url": "https://www.nintendo.com/kr/games/switch2/lineup/index.html",
+    "tags": "액션, 무쌍, 어드벤처, 대규모 전투",
+    "summary": "젤다의 전설 세계관을 배경으로 한 무쌍 액션. 다양한 캐릭터로 대규모 전투를 즐길 수 있습니다."
+  },
+  {
+    "game_id": "switch_p3_reload",
+    "name": "페르소나3 리로드",
+    "version": "",
+    "update_date": "2025-10-23",
+    "description": "발매예정 · RPG · 미표기",
+    "platform": "switch",
+    "url": "https://www.nintendo.com/kr/games/switch2/lineup/index.html",
+    "tags": "RPG, 턴제, 스토리, 리메이크",
+    "summary": "페르소나 3를 현대적으로 재해석한 리메이크. 학원 생활과 던전 탐험을 오가며 이야기를 펼칩니다."
+  },
+  {
+    "game_id": "switch_dq12_hd2d",
+    "name": "드래곤 퀘스트 I & II HD-2D Remake",
+    "version": "",
+    "update_date": "2025-10-30",
+    "description": "발매예정 · RPG · 미표기",
+    "platform": "switch",
+    "url": "https://www.nintendo.com/kr/games/switch2/lineup/index.html",
+    "tags": "RPG, JRPG, HD-2D, 리메이크",
+    "summary": "드래곤 퀘스트 1·2를 HD-2D 스타일로 리메이크한 작품. 클래식한 모험을 현대적인 표현으로 다시 즐길 수 있습니다."
+  },
+  {
+    "game_id": "switch_dbz_sparking_zero",
+    "name": "드래곤볼 스파킹! 제로",
+    "version": "",
+    "update_date": "2025-11-13",
+    "description": "발매예정 · 대전액션 · 미표기",
+    "platform": "switch",
+    "url": "https://www.nintendo.com/kr/games/switch2/lineup/index.html",
+    "tags": "대전, 액션, 드래곤볼, 3D 격투",
+    "summary": "드래곤볼 캐릭터로 펼치는 3D 격투 액션. 속도감 있는 전투와 다양한 기술을 체험할 수 있습니다."
+  },
+  {
+    "game_id": "switch_ryu_ga_gotoku_kiwami",
+    "name": "용과 같이 극",
+    "version": "",
+    "update_date": "2025-11-13",
+    "description": "발매예정 · 액션 어드벤처 · 미표기",
+    "platform": "switch",
+    "url": "https://www.nintendo.com/kr/games/switch2/lineup/index.html",
+    "tags": "액션 어드벤처, 범죄 드라마, 스토리, 리메이크",
+    "summary": "용과 같이 1편의 리메이크. 가슴 뜨거운 스토리와 거리를 누비는 액션이 특징입니다."
+  },
+  {
+    "game_id": "switch_ryu_ga_gotoku_kiwami_2",
+    "name": "용과 같이 극 2",
+    "version": "",
+    "update_date": "2025-11-13",
+    "description": "발매예정 · 액션 어드벤처 · 미표기",
+    "platform": "switch",
+    "url": "https://www.nintendo.com/kr/games/switch2/lineup/index.html",
+    "tags": "액션 어드벤처, 범죄 드라마, 스토리, 리메이크",
+    "summary": "용과 같이 2편의 리메이크. 개선된 전투와 깊이 있는 서사를 제공합니다."
+  },
+  {
+    "game_id": "switch_octopath_zero",
+    "name": "옥토패스 트래블러 0",
+    "version": "",
+    "update_date": "2025-12-04",
+    "description": "발매예정 · RPG · 미표기",
+    "platform": "switch",
+    "url": "https://www.nintendo.com/kr/games/switch2/lineup/index.html",
+    "tags": "RPG, 턴제, 픽셀 아트, HD-2D",
+    "summary": "옥토패스 트래블러의 프리퀄. 8명의 주인공이 각자의 이야기로 엮이는 턴제 RPG입니다."
   },
   {
     "game_id": "steam_1281640",
