@@ -10,9 +10,9 @@
   {
     "game_id": "nikke",
     "version": "",
-    "update_date": "2025-09-24T07:00:00+09:00",
-    "end_date": "2025-10-21T23:59:00+09:00",
-    "description": "콜라보 기간 한정 Pick Up 모집: 에이다 웡 · 10/21(화) 23:59까지",
+    "update_date": "2025-09-24",
+    "end_date": "2025-10-21",
+    "description": "시작일 : 9/24\n종료일 : 10/21\n[신규] 에이다 웡",
     "url": "https://naver.me/5dAjbncG"
   },
   {
@@ -38,6 +38,13 @@
     "end_date": "2025-10-08",
     "description": "시작일 : 9/17\n종료일 : 10/8\n[신규] 유노\n[복각] 샤콘",
     "url": "https://naver.me/xjUWz9Qf"
+  },
+  {
+    "game_id": "ww",
+    "version": "2.7",
+    "update_date": "2025-09-26T20:00:00+09:00",
+    "description": "2.7버전 프리뷰 특별 방송",
+    "url": "https://www.youtube.com/live/twbBfSE1Ydk?si=mlrP8ltrit1e_c0y"
   },
   {
     "game_id": "switch_pokemon_za",
