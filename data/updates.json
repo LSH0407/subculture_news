@@ -23,12 +23,13 @@
     "game_id": "switch_pokemon_za",
     "name": "포켓몬 LEGENDS Z-A",
     "version": "",
-    "update_date": "2025-09-12",
+    "update_date": "2025-10-16",
     "description": "발매예정 · RPG · 65,000원",
     "platform": "switch",
     "url": "https://pokemonkorea.co.kr/legends_z-a",
     "tags": "RPG, 어드벤처, 포켓몬, 메가진화, 오픈월드",
-    "summary": "포켓몬스터 LEGENDS 시리즈의 새로운 작품. 루미오시티를 무대로 한 새로운 모험이 시작됩니다. 메가진화가 돌아온다!"
+    "summary": "포켓몬스터 LEGENDS 시리즈의 새로운 작품. 루미오시티를 무대로 한 새로운 모험이 시작됩니다. 메가진화가 돌아온다!",
+    "header_image": "https://data1.pokemonkorea.co.kr/newdata/2025/05/2025-05-28_21-40-03-98703-1748436003.jpg"
   },
   {
     "game_id": "steam_2106150",
