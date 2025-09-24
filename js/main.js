@@ -367,24 +367,32 @@ function toCalendarEvents(updates, gameMap) {
             console.log(`Game ID: ${u.game_id}, Game Name: ${game?.name}, Title: ${title}`);
         }
         
-        // 스팀 헤더 이미지: updates.json의 header_image 우선, 그 외 CDN 후보들을 폴백으로 제공
-        let headerImage = u.header_image || u.headerImage || '';
-        let headerCandidates = [];
-        if (typeof u.game_id === 'string' && u.game_id.startsWith('steam_')) {
-            const appid = u.game_id.replace('steam_', '');
-            const cdnCandidates = [
-                `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${appid}/header.jpg`,
-                `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/header.jpg`,
-                `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/header.jpg`,
-                `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/capsule_616x353.jpg`,
-                `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/capsule_616x353.jpg`
-            ];
-            // 현재 선택된 headerImage를 제외하고 폴백 목록 구성
-            headerCandidates = cdnCandidates.filter(u => u !== headerImage);
-            if (!headerImage) {
-                headerImage = cdnCandidates[0];
-            }
-        }
+               // 헤더 이미지: Steam과 Switch 게임을 다르게 처리
+               let headerImage = u.header_image || u.headerImage || '';
+               let headerCandidates = [];
+               
+               if (typeof u.game_id === 'string' && u.game_id.startsWith('steam_')) {
+                   // Steam 게임: CDN 후보들을 폴백으로 제공
+                   const appid = u.game_id.replace('steam_', '');
+                   const cdnCandidates = [
+                       `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${appid}/header.jpg`,
+                       `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/header.jpg`,
+                       `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/header.jpg`,
+                       `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/capsule_616x353.jpg`,
+                       `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/capsule_616x353.jpg`
+                   ];
+                   // 현재 선택된 headerImage를 제외하고 폴백 목록 구성
+                   headerCandidates = cdnCandidates.filter(u => u !== headerImage);
+                   if (!headerImage) {
+                       headerImage = cdnCandidates[0];
+                   }
+               } else if (u.platform === 'switch' && headerImage) {
+                   // Switch 게임: HTML 태그에서 src 추출
+                   const srcMatch = headerImage.match(/src="([^"]+)"/);
+                   if (srcMatch) {
+                       headerImage = srcMatch[1];
+                   }
+               }
         
         return {
             title,
@@ -448,11 +456,11 @@ function setupCalendar(gameMap) {
         eventContent: (arg) => {
             const ex = arg.event.extendedProps || {};
             const bg = ex.color?.bg || '#0d6efd';
-            // 썸네일: 기존 5개 게임은 이미지, 신작(steam_/coming_)은 "신" 배지
+            // 썸네일: 기존 5개 게임은 이미지, 신작은 플랫폼 아이콘
             let thumbHtml = '';
             if (ex.thumb) {
                 thumbHtml = `<img class=\"chip-thumb\" src=\"${ex.thumb}\" alt=\"thumb\">`;
-            } else if (ex.isNew) {
+            } else if (ex.isNew || ex.platform === 'switch') {
                 const icon = (ex.platform === 'switch') ? 'assets/switch.png' : 'assets/steam.png';
                 thumbHtml = `<img class=\"chip-thumb\" src=\"${icon}\" alt=\"platform\">`;
             }

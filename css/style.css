@@ -111,6 +111,7 @@ body {
     border-radius: 8px;
     color: #fff;
     font-weight: 600;
+    min-width: 0; /* 그리드 아이템이 축소될 수 있도록 */
 }
 .event-chip .chip-thumb {
     width: 18px;
@@ -118,6 +119,12 @@ body {
     border-radius: 4px;
     object-fit: cover;
     flex: 0 0 18px;
+}
+.event-chip .event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 .chip-badge {
     display: inline-flex;
