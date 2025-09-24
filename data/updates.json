@@ -26,8 +26,10 @@
   {
     "game_id": "zzz",
     "version": "2.2",
-    "update_date": "2025-09-24T13:00:00+09:00",
-    "description": "[신규] 오피 & 도깨비불 / [복각] 이블린 픽업 시작"
+    "update_date": "2025-09-24",
+    "end_date": "2025-10-14",
+    "description": "시작일 : 9/24\n종료일 : 10/14\n[신규] 오피 & 도깨비불\n[복각] 이블린",
+    "url": "https://naver.me/FXkEln5v"
   },
   {
     "game_id": "switch_pokemon_za",
