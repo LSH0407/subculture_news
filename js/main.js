@@ -356,7 +356,8 @@ async function init() {
 document.addEventListener("DOMContentLoaded", init);
 
 function toCalendarEvents(updates, gameMap) {
-    return updates.map(u => {
+    const events = [];
+    updates.forEach(u => {
         const game = gameMap.get(u.game_id);
         const isNew = String(u.game_id || '').startsWith('steam_') || String(u.game_id || '').startsWith('coming_');
         // 게임 이름 우선순위: games.json의 name > updates.json의 name > game_id
@@ -396,31 +397,59 @@ function toCalendarEvents(updates, gameMap) {
                    }
                }
         
-        return {
-            title,
-            start: u.update_date,
-            end: u.end_date || undefined,
-            allDay: !(typeof u.update_date === 'string' && u.update_date.includes('T')),
-            backgroundColor: getThemeColor(),
-            borderColor: getThemeColor(),
-            textColor: '#fff',
-            extendedProps: {
-                gameId: u.game_id,
-                description: u.description || "",
-                version: u.version || "",
-                thumb: game?.thumbnail || "",
-                color: { bg: getThemeColor() },
-                url: u.url || '',
-                isNew,
-                platform: u.platform || 'steam',
-                name: u.name || game?.name || title,
-                tags: u.tags || '',
-                summary: u.summary || '',
-                headerImage,
-                headerCandidates,
-            }
+        const baseExtended = {
+            gameId: u.game_id,
+            description: u.description || "",
+            version: u.version || "",
+            thumb: game?.thumbnail || "",
+            color: { bg: getThemeColor() },
+            url: u.url || '',
+            isNew,
+            platform: u.platform || 'steam',
+            name: u.name || game?.name || title,
+            tags: u.tags || '',
+            summary: u.summary || '',
+            headerImage,
+            headerCandidates,
         };
+
+        const isTimed = typeof u.update_date === 'string' && u.update_date.includes('T');
+
+        if (u.end_date && String(u.end_date) !== String(u.update_date)) {
+            // 시작일 이벤트 (단일)
+            events.push({
+                title,
+                start: u.update_date,
+                allDay: !isTimed,
+                backgroundColor: getThemeColor(),
+                borderColor: getThemeColor(),
+                textColor: '#fff',
+                extendedProps: { ...baseExtended, milestone: 'start' }
+            });
+            // 종료일 이벤트 (단일, 제목에 종료 표기)
+            events.push({
+                title,
+                start: u.end_date,
+                allDay: !(typeof u.end_date === 'string' && u.end_date.includes('T')),
+                backgroundColor: getThemeColor(),
+                borderColor: getThemeColor(),
+                textColor: '#fff',
+                extendedProps: { ...baseExtended, milestone: 'end' }
+            });
+        } else {
+            // 단일 이벤트
+            events.push({
+                title,
+                start: u.update_date,
+                allDay: !isTimed,
+                backgroundColor: getThemeColor(),
+                borderColor: getThemeColor(),
+                textColor: '#fff',
+                extendedProps: { ...baseExtended }
+            });
+        }
     });
+    return events;
 }
 
 function setupCalendar(gameMap) {
