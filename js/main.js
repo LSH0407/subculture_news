@@ -44,6 +44,11 @@ function filterUpdates(updates) {
             return true;
         }
         
+        // Switch 게임 카테고리가 선택된 경우
+        if (state.selectedGames.has('switch_all') && update.platform === 'switch') {
+            return true;
+        }
+        
         // 개별 게임이 선택된 경우
         return state.selectedGames.has(update.game_id);
     });
@@ -159,9 +164,17 @@ function populateGameFilter(games) {
     
     // games.json에 있는 모든 게임들 표시 (일정이 없어도 표시)
     const steamGames = Array.from(gameIds).filter(id => id.startsWith('steam_'));
-    const otherGames = Array.from(gameIds).filter(id => !games.find(g => g.id === id) && !id.startsWith('steam_'));
+    const switchGames = Array.from(gameIds).filter(id => {
+        const update = state.updates.find(u => u.game_id === id);
+        return update && update.platform === 'switch';
+    });
+    const otherGames = Array.from(gameIds).filter(id => 
+        !games.find(g => g.id === id) && 
+        !id.startsWith('steam_') && 
+        !switchGames.includes(id)
+    );
     
-    console.log('All games from games.json:', games.length, 'Steam games:', steamGames.length, 'Other games:', otherGames.length);
+    console.log('All games from games.json:', games.length, 'Steam games:', steamGames.length, 'Switch games:', switchGames.length, 'Other games:', otherGames.length);
     
     // games.json의 모든 게임들 표시 (일정이 있든 없든)
     games.forEach(game => {
@@ -175,6 +188,13 @@ function populateGameFilter(games) {
         const steamCheckbox = createGameCheckbox('steam_all', `Steam 게임 (${steamGames.length}개)`, 'assets/steam.png');
         filterEl.appendChild(steamCheckbox);
         console.log('Added Steam games category:', steamGames.length);
+    }
+    
+    // Switch 게임들을 하나의 카테고리로 묶기
+    if (switchGames.length > 0) {
+        const switchCheckbox = createGameCheckbox('switch_all', `닌텐도 스위치 게임 (${switchGames.length}개)`, 'assets/switch.png');
+        filterEl.appendChild(switchCheckbox);
+        console.log('Added Switch games category:', switchGames.length);
     }
     
     // 기타 게임들 표시
@@ -297,6 +317,8 @@ async function init() {
         });
         // Steam 게임 카테고리도 추가
         allGameIds.add('steam_all');
+        // Switch 게임 카테고리도 추가
+        allGameIds.add('switch_all');
         state.selectedGames = allGameIds;
         console.log('Selected games count:', state.selectedGames.size);
         
