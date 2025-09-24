@@ -1,0 +1,202 @@
+/* 기본 스타일 및 다크 모드 대응 */
+
+:root {
+    --card-radius: 0.5rem;
+}
+
+body {
+    background-color: var(--bs-body-bg);
+}
+
+.thumb-64 {
+    width: 64px;
+    height: 64px;
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
+
+.card {
+    border-radius: var(--card-radius);
+}
+
+/* 달력 스타일 */
+#calendar {
+    min-height: 640px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,249,250,1) 100%);
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    padding: 10px;
+}
+
+/* 달력 셀 높이 증가 */
+.fc-daygrid-day {
+    min-height: 120px !important;
+}
+
+.fc-daygrid-day-events {
+    margin: 2px 0;
+}
+
+.fc-daygrid-event {
+    margin: 1px 0;
+}
+
+/* 일정이 없는 날짜도 명확하게 표시 */
+.fc-daygrid-day-number {
+    font-weight: 600;
+    color: #495057;
+}
+
+.fc-day-other .fc-daygrid-day-number {
+    color: #6c757d;
+    opacity: 0.7;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px;
+}
+
+/* 더보기 링크는 유지하되, 10개까지는 모두 표시 */
+.fc-daygrid-more-link {
+    display: block !important;
+}
+
+.fc {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+}
+
+.fc .fc-scrollgrid, .fc-theme-standard .fc-scrollgrid {
+    border: none;
+}
+
+.fc-daygrid-day, .fc-list {
+    border-radius: 8px;
+}
+
+.fc-toolbar-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.fc-toolbar-chunk .fc-button-group .fc-button,
+.fc .fc-button {
+    border-radius: 10px;
+    padding: 0.4rem 0.9rem;
+    border: none;
+    background: #0d6efd;
+}
+
+.fc .fc-button:hover { background: #0b5ed7; }
+.fc .fc-button:focus { box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.25); }
+.fc .fc-button-primary:not(:disabled).fc-button-active { background: #0b5ed7; }
+
+/* 이벤트 칩 */
+.event-chip {
+    display: grid;
+    grid-template-columns: 18px 1fr auto;
+    align-items: center;
+    column-gap: 8px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+}
+.event-chip .chip-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    object-fit: cover;
+    flex: 0 0 18px;
+}
+.chip-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: #212529;
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+}
+.event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 툴팁 스타일 */
+.event-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    max-width: 360px;
+    min-width: 160px;
+    z-index: 9999;
+    pointer-events: none;
+    transform: translateY(-6px);
+}
+
+.tooltip-content {
+    white-space: normal;
+    line-height: 1.35;
+}
+.tooltip-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.tooltip-tags {
+    color: #a5d8ff;
+    margin-bottom: 4px;
+}
+.tooltip-summary {
+    color: #e9ecef;
+}
+.tooltip-header { margin: 6px 0 8px; }
+.tooltip-header img { width: 100%; height: auto; display: block; border-radius: 6px; }
+.event-badge {
+    background: rgba(255,255,255,0.25);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: .75rem;
+}
+
+/* 범례 */
+#calendarLegend .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+#calendarLegend .swatch {
+    width: 14px; height: 14px; border-radius: 4px;
+}
+
+@media (max-width: 576px) {
+    .thumb-64 {
+        width: 48px;
+        height: 48px;
+    }
+    
+    #calendar { min-height: 540px; }
+    
+    .fc-toolbar-title {
+        font-size: 1.25rem;
+    }
+}
+
+
