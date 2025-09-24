@@ -536,6 +536,21 @@ function setupCalendar(gameMap) {
         moreLinkClick: 'popover',
         dayMaxEvents: () => state.eventLimit, // 동적으로 이벤트 제한 적용
         height: 'auto', // 높이 자동 조정
+        datesSet: () => {
+            const rightChunk = document.querySelector('.fc-header-toolbar .fc-toolbar-chunk:last-child');
+            if (rightChunk && !document.getElementById('typeLegend')) {
+                const legend = document.createElement('div');
+                legend.id = 'typeLegend';
+                legend.innerHTML = `
+                    <span><i class=\"dot\" style=\"background:#0d6efd\"></i>업데이트</span>
+                    <span><i class=\"dot\" style=\"background:#ffc107\"></i>방송</span>
+                    <span><i class=\"dot\" style=\"background:#198754\"></i>신규발매</span>
+                    <span><i class=\"dot\" style=\"background:#dc3545\"></i>종료</span>
+                `;
+                // 버튼 그룹 앞에 삽입하여 겹침 방지
+                rightChunk.insertBefore(legend, rightChunk.firstChild);
+            }
+        },
         eventDisplay: 'block', // 이벤트를 블록으로 표시
         showNonCurrentDates: true, // 이전/다음 달 날짜들도 표시
         fixedWeekCount: false, // 고정된 주 수 사용하지 않음
