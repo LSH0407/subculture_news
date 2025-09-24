@@ -439,11 +439,13 @@ function toCalendarEvents(updates, gameMap) {
             return 'update';
         };
         const type = pickType();
+        // 유형 기본 색상: 업데이트(파랑), 방송(황금), 신규발매(초록)
         const typeColor = (t => ({
             update: '#0d6efd',
-            broadcast: '#6f42c1',
+            broadcast: '#ffc107', // 황금색
             release: '#198754',
         })[t] || '#0d6efd')(type);
+        const END_COLOR = '#dc3545'; // 종료일 이벤트는 빨간색
 
         const baseExtended = {
             gameId: u.game_id,
@@ -478,15 +480,15 @@ function toCalendarEvents(updates, gameMap) {
                 textColor: '#fff',
                 extendedProps: { ...baseExtended, milestone: 'start' }
             });
-            // 종료일 이벤트 (단일, 제목에 종료 표기)
+            // 종료일 이벤트 (단일, 빨간색 강조)
             events.push({
                 title,
                 start: u.end_date,
                 allDay: !(typeof u.end_date === 'string' && u.end_date.includes('T')),
-                backgroundColor: typeColor,
-                borderColor: typeColor,
+                backgroundColor: END_COLOR,
+                borderColor: END_COLOR,
                 textColor: '#fff',
-                extendedProps: { ...baseExtended, milestone: 'end' }
+                extendedProps: { ...baseExtended, milestone: 'end', color: { bg: END_COLOR } }
             });
         } else {
             // 단일 이벤트
