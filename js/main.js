@@ -54,9 +54,21 @@ function renderStats(filtered) {
     if (!statsEl) return;
     const total = state.updates.length;
     const shown = filtered.length;
-    const dateRange = filtered.length
-        ? `${formatDate(filtered[filtered.length - 1].update_date)} ~ ${formatDate(filtered[0].update_date)}`
-        : "표시할 업데이트가 없습니다";
+    
+    let dateRange = "표시할 업데이트가 없습니다";
+    if (filtered.length > 0) {
+        // 날짜순으로 정렬
+        const sortedByDate = [...filtered].sort((a, b) => {
+            const dateA = new Date(a.update_date);
+            const dateB = new Date(b.update_date);
+            return dateA - dateB;
+        });
+        
+        const earliestDate = formatDate(sortedByDate[0].update_date);
+        const latestDate = formatDate(sortedByDate[sortedByDate.length - 1].update_date);
+        dateRange = `${earliestDate} ~ ${latestDate}`;
+    }
+    
     statsEl.textContent = `표시: ${shown} / 전체: ${total} · 범위: ${dateRange}`;
 }
 
