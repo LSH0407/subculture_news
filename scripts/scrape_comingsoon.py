@@ -205,7 +205,7 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
             "game_id": f"steam_{e['appid']}" if e.get("appid") else f"coming_{e['name']}",
             "version": "",
             "update_date": e["release_date"],
-            "description": f"발매예정 · {e['genres']} · {e['price']}",
+            "description": f"발매예정 · {e['genres']}",
             "name": e["name"],
             "url": e.get("url", ""),
             "platform": e.get("platform", "steam"),
@@ -243,8 +243,25 @@ def main():
         except Exception:
             return False
 
+    # 기존 Steam 게임들을 제거
     filtered = [e for e in existing if not is_target(e)]
-    merged = filtered + updates
+    
+    # 추가 중복 제거: 같은 이름과 날짜를 가진 게임들 제거
+    def is_duplicate(entry: Dict, new_entries: List[Dict]) -> bool:
+        for new_entry in new_entries:
+            if (entry.get("name") == new_entry.get("name") and 
+                entry.get("update_date") == new_entry.get("update_date") and
+                entry.get("platform") == new_entry.get("platform")):
+                return True
+        return False
+    
+    # 새로운 업데이트에서 중복 제거
+    unique_updates = []
+    for update in updates:
+        if not is_duplicate(update, unique_updates):
+            unique_updates.append(update)
+    
+    merged = filtered + unique_updates
 
     with open(updates_path, "w", encoding="utf-8") as f:
         json.dump(merged, f, ensure_ascii=False, indent=2)
