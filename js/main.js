@@ -74,7 +74,7 @@ function renderStats(filtered) {
         dateRange = `${earliestDate} ~ ${latestDate}`;
     }
     
-    statsEl.textContent = `표시: ${shown} / 전체: ${total} · 범위: ${dateRange}`;
+    statsEl.textContent = `표시: ${shown} / 전체: ${total}`;
 }
 
 function createGameCard(game, updates) {
