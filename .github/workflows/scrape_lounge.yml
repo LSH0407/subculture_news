@@ -26,19 +26,43 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4 python-dateutil
+          sudo apt-get update && sudo apt-get install -y jq
 
       - name: Run Lounge scraper
         env:
           LOUNGE_LIMIT: '20'
         run: |
           python scripts/scrape_lounge.py
+          
+      - name: Log action results
+        run: |
+          # 로그 데이터 생성
+          LOG_DATA=$(cat << EOF
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "action": "naver_lounge",
+            "status": "success",
+            "changes": $(git diff --numstat data/updates.json | head -1 | awk '{print $1 "+" $2 "-"}'),
+            "commit": "$(git rev-parse HEAD)",
+            "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+          }
+          EOF
+          )
+          
+          # 기존 로그 파일 읽기
+          if [ -f "data/action_logs.json" ]; then
+            jq ". += [$LOG_DATA]" data/action_logs.json > temp_logs.json
+            mv temp_logs.json data/action_logs.json
+          else
+            echo "[$LOG_DATA]" > data/action_logs.json
+          fi
 
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [ -n "$(git status --porcelain)" ]; then
-            git add data/updates.json
+            git add data/updates.json data/action_logs.json
             git commit -m "chore(ci): auto-update Naver Game Lounge events (cron)"
             git push
           else
