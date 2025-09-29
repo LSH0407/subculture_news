@@ -25,8 +25,11 @@ function buildGameMap(games) {
 function formatDate(dateStr) {
     try {
         const d = dayjs(dateStr);
-        return d.isValid() ? d.format("YYYY-MM-DD") : dateStr;
-    } catch {
+        if (!d.isValid()) return dateStr;
+        // ISO 문자열에 시간이 포함되어 있으면 시간까지 표시
+        const hasTime = typeof dateStr === 'string' && dateStr.includes('T');
+        return d.format(hasTime ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD");
+    } catch (e) {
         return dateStr;
     }
 }
