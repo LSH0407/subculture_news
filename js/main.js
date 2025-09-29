@@ -173,19 +173,13 @@ function populateGameFilter(games) {
         filterEl.appendChild(checkbox);
     });
     
-    // 줄바꿈: 서브컬쳐와 콘솔 묶음 시각 분리
-    filterEl.appendChild(document.createElement('div')).className = 'w-100';
-    
-    // 콘솔: Switch 먼저, 다음 줄에 Steam 묶음
+    // 같은 줄에 콘솔 묶음: Switch, Steam 순서로 나란히
     if (switchGames.length > 0) {
         const switchCheckbox = createGameCheckbox('switch_all', `닌텐도 스위치`, 'assets/switch.png');
         filterEl.appendChild(switchCheckbox);
     }
-    
-    // 줄바꿈 후 Steam
-    filterEl.appendChild(document.createElement('div')).className = 'w-100';
     if (steamGames.length > 0) {
-        const steamCheckbox = createGameCheckbox('steam_all', `Steam`, 'assets/steam.png');
+        const steamCheckbox = createGameCheckbox('steam_all', `Steam(인기발매예정)`, 'assets/steam.png');
         filterEl.appendChild(steamCheckbox);
     }
     
