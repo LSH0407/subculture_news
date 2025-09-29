@@ -1,47 +1,161 @@
+#!/usr/bin/env python3
+"""
+HoYoLAB Selenium 기반 스크래퍼 (기존 스크래퍼 교체)
+동적 로딩 문제 해결을 위해 Selenium 사용
+"""
+
 import json
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Tuple
 
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 
 BASE = "https://www.hoyolab.com"
 
 
+def setup_driver():
+    """Chrome WebDriver 설정"""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # 헤드리스 모드
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (compatible; subculture-news/1.0)")
+    
+    driver = webdriver.Chrome(options=chrome_options)
+    return driver
+
+
 def fetch_posts(author_id: str, limit: int = 20) -> List[Dict]:
-    """Fetch latest posts from HoYoLAB author page (simple HTML parse)."""
-    url = f"{BASE}/accountCenter/postList?id={author_id}"
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; subculture-news/1.0)"}
-    res = requests.get(url, headers=headers, timeout=30)
-    res.raise_for_status()
-    soup = BeautifulSoup(res.text, "html.parser")
-    posts: List[Dict] = []
-
-    # HoYoLAB는 종종 동적이지만, SSR된 링크/타이틀이 포함되는 경우가 있어 대비
-    for a in soup.select("a[href*='/article/']"):
-        title = a.get_text(strip=True)
-        href = a.get("href")
-        if not title or not href:
-            continue
-        if not href.startswith("http"):
-            href = BASE + href
-        posts.append({"title": title, "url": href})
-        if len(posts) >= limit:
-            break
-
-    # 본문은 각 글을 개별 요청해서 가져온다 (필요 시)
-    for p in posts:
+    """Selenium을 사용하여 HoYoLAB 포스트 가져오기"""
+    driver = setup_driver()
+    posts = []
+    
+    try:
+        url = f"{BASE}/accountCenter/postList?id={author_id}"
+        print(f"Fetching from: {url}")
+        driver.get(url)
+        
+        # 페이지 로딩 대기
+        wait = WebDriverWait(driver, 10)
+        
+        # 포스트 링크들이 로드될 때까지 대기
         try:
-            pr = requests.get(p["url"], headers=headers, timeout=30)
-            pr.raise_for_status()
-            psoup = BeautifulSoup(pr.text, "html.parser")
-            body = psoup.get_text("\n", strip=True)
-            p["body"] = body
-        except Exception:
-            p["body"] = ""
+            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "a[href*='/article/']")))
+        except TimeoutException:
+            print("포스트 링크를 찾을 수 없습니다. 페이지 구조를 확인합니다...")
+            # 페이지 소스 확인
+            page_source = driver.page_source
+            if "Loading" in page_source and len(page_source) < 1000:
+                print("페이지가 여전히 로딩 중입니다.")
+                return posts
+            else:
+                print("페이지는 로드되었지만 예상된 구조가 아닙니다.")
+        
+        # 포스트 링크들 찾기
+        post_links = driver.find_elements(By.CSS_SELECTOR, "a[href*='/article/']")
+        print(f"Found {len(post_links)} post links")
+        
+        seen_urls = set()
+        for i, link in enumerate(post_links[:limit]):
+            try:
+                title = link.text.strip()
+                href = link.get_attribute("href")
+                
+                # 제목이 비어있으면 부모 요소에서 찾기
+                if not title:
+                    try:
+                        parent = link.find_element(By.XPATH, "./..")
+                        title = parent.text.strip()
+                    except:
+                        pass
+                
+                # 여전히 비어있으면 다른 방법으로 찾기
+                if not title:
+                    try:
+                        # 링크 주변의 텍스트 요소들 찾기
+                        title_elements = driver.find_elements(By.XPATH, f"//a[@href='{href}']/following-sibling::* | //a[@href='{href}']/preceding-sibling::*")
+                        for elem in title_elements:
+                            if elem.text.strip():
+                                title = elem.text.strip()
+                                break
+                    except:
+                        pass
+                
+                print(f"링크 {i+1}: title='{title}', href='{href}'")
+                
+                if not href:
+                    print(f"  -> URL이 비어있음, 건너뜀")
+                    continue
+                
+                # reply 파라미터가 있는 URL은 제외
+                if "?reply=" in href:
+                    print(f"  -> 댓글 링크, 건너뜀")
+                    continue
+                
+                if href in seen_urls:
+                    print(f"  -> 중복 URL, 건너뜀")
+                    continue
+                    
+                seen_urls.add(href)
+                posts.append({"title": title or "", "url": href})
+                print(f"  -> 추가됨: {title or '(제목 없음)'}")
+                
+                # 특별 방송 관련 키워드 체크
+                if "특별 방송" in title:
+                    print(f"   *** 특별 방송 발견! ***")
+                if "방송" in title:
+                    print(f"   *** 방송 관련 포스트 발견! ***")
+                if "프리뷰" in title:
+                    print(f"   *** 프리뷰 관련 포스트 발견! ***")
+                if "버전" in title:
+                    print(f"   *** 버전 관련 포스트 발견! ***")
+                    
+            except Exception as e:
+                print(f"링크 처리 중 오류: {e}")
+                continue
+        
+        # 각 포스트의 본문 가져오기
+        for post in posts:
+            try:
+                driver.get(post["url"])
+                wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+                
+                # 제목이 비어있으면 페이지에서 다시 찾기
+                if not post["title"] or len(post["title"]) < 10:
+                    try:
+                        title_element = driver.find_element(By.TAG_NAME, "h1")
+                        new_title = title_element.text.strip()
+                        if new_title:
+                            post["title"] = new_title
+                            print(f"  -> 제목 업데이트: {new_title}")
+                    except:
+                        pass
+                
+                # 본문 텍스트 추출
+                body_element = driver.find_element(By.TAG_NAME, "body")
+                body_text = body_element.text
+                post["body"] = body_text
+                
+            except Exception as e:
+                print(f"포스트 본문 가져오기 실패 {post['url']}: {e}")
+                post["body"] = ""
+                
+    except Exception as e:
+        print(f"스크래핑 중 오류 발생: {e}")
+        
+    finally:
+        driver.quit()
+    
     return posts
 
 
@@ -245,18 +359,33 @@ def main():
 
     all_updates: List[Dict] = []
 
+    # ZZZ 스크래핑
     try:
+        print("=== ZZZ HoYoLAB Selenium 스크래핑 시작 ===")
         zzz_posts = fetch_posts(zzz_id, limit=limit)
-        all_updates += parse_zzz(zzz_posts)
+        print(f"ZZZ: 총 {len(zzz_posts)}개 포스트 수집")
+        
+        zzz_updates = parse_zzz(zzz_posts)
+        all_updates += zzz_updates
+        print(f"ZZZ: {len(zzz_updates)}개 업데이트 파싱")
+        
     except Exception as e:
-        print("ZZZ scrape failed:", e)
+        print(f"ZZZ Selenium scrape failed: {e}")
 
+    # 스타레일 스크래핑
     try:
+        print("=== Star Rail HoYoLAB Selenium 스크래핑 시작 ===")
         sr_posts = fetch_posts(sr_id, limit=limit)
-        all_updates += parse_star_rail(sr_posts)
+        print(f"Star Rail: 총 {len(sr_posts)}개 포스트 수집")
+        
+        sr_updates = parse_star_rail(sr_posts)
+        all_updates += sr_updates
+        print(f"Star Rail: {len(sr_updates)}개 업데이트 파싱")
+        
     except Exception as e:
-        print("Star Rail scrape failed:", e)
+        print(f"Star Rail Selenium scrape failed: {e}")
 
+    print(f"=== 총 {len(all_updates)}개 업데이트 병합 ===")
     merge_updates(all_updates)
 
 
