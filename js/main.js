@@ -165,25 +165,28 @@ function populateGameFilter(games) {
     
     console.log('All games from games.json:', games.length, 'Steam games:', steamGames.length, 'Switch games:', switchGames.length, 'Other games:', otherGames.length);
     
-    // games.json의 모든 게임들 표시 (일정이 있든 없든)
-    games.forEach(game => {
+    // 서브컬쳐(고정 5종) 우선 표시
+    const subcultureIds = ['nikke','ww','genshin','star_rail','zzz'];
+    const subcultureGames = games.filter(g => subcultureIds.includes(g.id));
+    subcultureGames.forEach(game => {
         const checkbox = createGameCheckbox(game.id, game.name, game.thumbnail);
         filterEl.appendChild(checkbox);
-        console.log('Added checkbox for game:', game.name);
     });
     
-    // Steam 게임들을 하나의 카테고리로 묶기
-    if (steamGames.length > 0) {
-        const steamCheckbox = createGameCheckbox('steam_all', `Steam 게임 (${steamGames.length}개)`, 'assets/steam.png');
-        filterEl.appendChild(steamCheckbox);
-        console.log('Added Steam games category:', steamGames.length);
+    // 줄바꿈: 서브컬쳐와 콘솔 묶음 시각 분리
+    filterEl.appendChild(document.createElement('div')).className = 'w-100';
+    
+    // 콘솔: Switch 먼저, 다음 줄에 Steam 묶음
+    if (switchGames.length > 0) {
+        const switchCheckbox = createGameCheckbox('switch_all', `닌텐도 스위치`, 'assets/switch.png');
+        filterEl.appendChild(switchCheckbox);
     }
     
-    // Switch 게임들을 하나의 카테고리로 묶기
-    if (switchGames.length > 0) {
-        const switchCheckbox = createGameCheckbox('switch_all', `닌텐도 스위치 게임 (${switchGames.length}개)`, 'assets/switch.png');
-        filterEl.appendChild(switchCheckbox);
-        console.log('Added Switch games category:', switchGames.length);
+    // 줄바꿈 후 Steam
+    filterEl.appendChild(document.createElement('div')).className = 'w-100';
+    if (steamGames.length > 0) {
+        const steamCheckbox = createGameCheckbox('steam_all', `Steam`, 'assets/steam.png');
+        filterEl.appendChild(steamCheckbox);
     }
     
     // 기타 게임들 표시
@@ -192,7 +195,6 @@ function populateGameFilter(games) {
         const name = update?.name || gameId;
         const checkbox = createGameCheckbox(gameId, name, '');
         filterEl.appendChild(checkbox);
-        console.log('Added checkbox for other game:', name);
     });
     
     console.log('Total checkboxes created:', filterEl.children.length);
@@ -277,7 +279,39 @@ function bindControls(updateView) {
             updateView();
         });
     }
-
+    
+    // 콘솔만 버튼: Steam/스위치만 선택
+    const selectConsoleBtn = document.getElementById('selectConsole');
+    if (selectConsoleBtn) {
+        selectConsoleBtn.addEventListener('click', () => {
+            const checkboxes = gameFilter.querySelectorAll('input[type="checkbox"]');
+            state.selectedGames.clear();
+            checkboxes.forEach(cb => {
+                const val = cb.value;
+                const isConsole = (val === 'steam_all') || (val === 'switch_all') || String(val).startsWith('steam_');
+                cb.checked = isConsole;
+                if (isConsole) state.selectedGames.add(val);
+            });
+            updateView();
+        });
+    }
+    
+    // 서브컬쳐만 버튼: 5종만 선택
+    const selectSubBtn = document.getElementById('selectSubculture');
+    if (selectSubBtn) {
+        selectSubBtn.addEventListener('click', () => {
+            const subs = new Set(['nikke','ww','genshin','star_rail','zzz']);
+            const checkboxes = gameFilter.querySelectorAll('input[type="checkbox"]');
+            state.selectedGames.clear();
+            checkboxes.forEach(cb => {
+                const on = subs.has(cb.value);
+                cb.checked = on;
+                if (on) state.selectedGames.add(cb.value);
+            });
+            updateView();
+        });
+    }
+    
     // 달력 이미지 저장
     const downloadBtn = document.getElementById('downloadCalendar');
     if (downloadBtn && window.html2canvas) {
