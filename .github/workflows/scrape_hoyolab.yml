@@ -72,6 +72,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git add data/updates.json data/action_logs.json
             git commit -m "chore(ci): auto-update HoYoLAB events (cron)"
+            git pull --rebase origin main
             git push
           else
             echo "No changes to commit"
