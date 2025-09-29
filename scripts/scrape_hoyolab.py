@@ -162,13 +162,14 @@ def fetch_posts(author_id: str, limit: int = 20) -> List[Dict]:
 def find_korean_datetime(text: str) -> Tuple[str, str]:
     """Return (iso_datetime_kst, human_md) from strings like '8월 22일 20:30(KST)'.
     If time missing, returns date only ISO (YYYY-MM-DD)."""
-    # ex: 8월 22일 20:30(KST)
-    m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*(\d{1,2}):(\d{2})\s*\(KST\)", text)
+    # ex: 8월 22일 20:30(KST) 또는 8월 22일 20:30（KST）
+    m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*(\d{1,2}):(\d{2})\s*[\(（]\s*KST\s*[\)）]", text)
     if m:
         mm, dd, hh, mi = map(int, m.groups())
         year = datetime.now().year
         dt = datetime(year, mm, dd, hh, mi)
         return dt.strftime("%Y-%m-%dT%H:%M:00+09:00"), f"{mm}/{dd} {hh:02d}:{mi:02d}"
+    # ex: 8월 22일 (시간 미포함)
     m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일", text)
     if m:
         mm, dd = map(int, m.groups())
@@ -220,15 +221,17 @@ def parse_zzz(posts: List[Dict]) -> List[Dict]:
         body = p.get("body", "")
         url = p["url"]
         ver = extract_version(title + " " + body)
-        # 특별 방송 예고
-        if "특별 방송 예고" in title:
+        # 특별 방송: 제목에 '특별 방송'이 포함되면 처리 (예고/표현 다양성 대응)
+        if "특별 방송" in title:
             dt_iso, md = find_korean_datetime(body)
-            if dt_iso and ver:
+            if not dt_iso:
+                dt_iso, md = find_korean_datetime(title)
+            if dt_iso:
                 results.append({
                     "game_id": "zzz",
-                    "version": ver,
+                    "version": ver or "",
                     "update_date": dt_iso,
-                    "description": f"{ver} 버전 특별 방송",
+                    "description": f"{ver} 버전 특별 방송" if ver else "특별 방송",
                     "url": url,
                 })
             continue
