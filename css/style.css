@@ -214,6 +214,22 @@ body {
 
 .fc-day-today { background: rgba(13,110,253,.06); }
 
+/* Game filter pill-like checkboxes */
+#subcultureFilter .form-check, #consoleFilter .form-check {
+  white-space: nowrap;
+}
+#subcultureFilter .form-check-label, #consoleFilter .form-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+}
+#subcultureFilter .form-check-input, #consoleFilter .form-check-input {
+  margin-right: 6px;
+}
+
 @media (max-width: 576px) {
     .thumb-64 {
         width: 48px;
