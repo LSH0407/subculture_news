@@ -39,7 +39,12 @@ jobs:
       - name: Log action results
         run: |
           # 로그 데이터 생성
-          CHANGES=$(git diff --numstat data/updates.json | head -1 | awk '{print $1 "+" $2 "-"}' || echo "0+0-")
+          if git diff --numstat data/updates.json | head -1 | grep -q .; then
+            CHANGES=$(git diff --numstat data/updates.json | head -1 | awk '{print $1 "+" $2 "-"}')
+          else
+            CHANGES="0+0-"
+          fi
+          
           LOG_DATA=$(cat << EOF
           {
             "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
