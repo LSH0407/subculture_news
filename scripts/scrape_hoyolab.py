@@ -125,14 +125,16 @@ def fetch_posts(author_id: str, limit: int = 20) -> List[Dict]:
                 continue
         
         # 각 포스트의 본문 가져오기
-        for post in posts:
+        for i, post in enumerate(posts):
             try:
+                print(f"  -> 포스트 {i+1}/{len(posts)} 처리 중: {post['url']}")
                 driver.get(post["url"])
                 wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
                 
-                # 제목이 비어있으면 페이지에서 다시 찾기
+                # 제목이 비어있으면 페이지에서 다시 찾기 (h1 로딩 대기 포함)
                 if not post["title"] or len(post["title"]) < 10:
                     try:
+                        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
                         title_element = driver.find_element(By.TAG_NAME, "h1")
                         new_title = title_element.text.strip()
                         if new_title:
@@ -141,10 +143,33 @@ def fetch_posts(author_id: str, limit: int = 20) -> List[Dict]:
                     except:
                         pass
                 
-                # 본문 텍스트 추출
-                body_element = driver.find_element(By.TAG_NAME, "body")
-                body_text = body_element.text
-                post["body"] = body_text
+                # 특별 방송 예고 포스트 강제 처리 (41364134)
+                if "41364134" in post["url"]:
+                    print(f"  -> 특별 방송 예고 포스트 감지, 강제 처리")
+                    try:
+                        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
+                        title_element = driver.find_element(By.TAG_NAME, "h1")
+                        new_title = title_element.text.strip()
+                        if new_title:
+                            post["title"] = new_title
+                            print(f"  -> 특별 방송 예고 제목 강제 업데이트: {new_title}")
+                    except Exception as e:
+                        print(f"  -> 특별 방송 예고 제목 업데이트 실패: {e}")
+                
+                # 본문 로딩 보강: 스크롤 후 innerText 재수집
+                try:
+                    # 페이지 하단까지 스크롤하여 동적 콘텐츠 로딩 유도
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    time.sleep(1)  # 로딩 대기
+                    
+                    # innerText로 더 정확한 텍스트 추출
+                    body_text = driver.execute_script("return document.body.innerText;")
+                    post["body"] = body_text
+                except:
+                    # fallback: 기존 방식
+                    body_element = driver.find_element(By.TAG_NAME, "body")
+                    body_text = body_element.text
+                    post["body"] = body_text
                 
             except Exception as e:
                 print(f"포스트 본문 가져오기 실패 {post['url']}: {e}")
@@ -162,8 +187,8 @@ def fetch_posts(author_id: str, limit: int = 20) -> List[Dict]:
 def find_korean_datetime(text: str) -> Tuple[str, str]:
     """Return (iso_datetime_kst, human_md) from strings like '8월 22일 20:30(KST)'.
     If time missing, returns date only ISO (YYYY-MM-DD)."""
-    # ex: 8월 22일 20:30(KST) 또는 8월 22일 20:30（KST）
-    m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*(\d{1,2}):(\d{2})\s*[\(（]\s*KST\s*[\)）]", text)
+    # ex: 8월 22일 20:30(KST) 또는 8월 22일 20:30（KST） - 전각 콜론, 전각 공백, KST 변형 모두 지원
+    m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*(\d{1,2})[:：]\s*(\d{2})\s*[\(（]?\s*KST\s*[\)）]?", text)
     if m:
         mm, dd, hh, mi = map(int, m.groups())
         year = datetime.now().year
@@ -221,19 +246,25 @@ def parse_zzz(posts: List[Dict]) -> List[Dict]:
         body = p.get("body", "")
         url = p["url"]
         ver = extract_version(title + " " + body)
-        # 특별 방송: 제목에 '특별 방송'이 포함되면 처리 (예고/표현 다양성 대응)
-        if "특별 방송" in title:
+        # 특별 방송: 제목 또는 본문에 '특별 방송' 또는 '예고' 포함 시 처리
+        if ("특별 방송" in title) or ("특별 방송" in body) or ("예고" in title) or ("예고" in body):
+            print(f"  -> 특별 방송 후보 발견: {title[:50]}...")
+            # 본문에서 시간 포함 형태 우선, 없으면 제목에서 재시도
             dt_iso, md = find_korean_datetime(body)
             if not dt_iso:
                 dt_iso, md = find_korean_datetime(title)
             if dt_iso:
-                results.append({
+                result = {
                     "game_id": "zzz",
                     "version": ver or "",
                     "update_date": dt_iso,
                     "description": f"{ver} 버전 특별 방송" if ver else "특별 방송",
                     "url": url,
-                })
+                }
+                results.append(result)
+                print(f"  -> 특별 방송 파싱 성공: {result}")
+            else:
+                print(f"  -> 특별 방송 날짜 파싱 실패")
             continue
         # 기간 한정 채널(상/하)
         if "기간 한정 채널" in title and ver:
