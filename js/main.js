@@ -595,6 +595,15 @@ function setupCalendar(gameMap) {
             const ex = info.event.extendedProps || {};
             const fullTitle = ex.name || info.event.title || '';
             
+            // 이벤트 시간 표시 라인 (시간 포함 이벤트만)
+            let whenLine = '';
+            try {
+                const hasTime = info.event && info.event.start && info.event.allDay === false;
+                if (hasTime) {
+                    whenLine = `일정: ${dayjs(info.event.start).format('YYYY-MM-DD HH:mm')}`;
+                }
+            } catch (e) {}
+            
             // tags: comma-separated → take top 5
             let tagLine = '';
             if (ex.tags) {
@@ -654,6 +663,7 @@ function setupCalendar(gameMap) {
 
             const desc = `
                 <div class=\"tooltip-title\">${fullTitle}</div>
+                ${whenLine ? `<div class=\"tooltip-tags\">${whenLine}</div>` : ''}
                 ${headerImg}
                 ${tagLine ? `<div class=\"tooltip-tags\">${tagLine}</div>` : ''}
                 ${priceLine ? `<div class=\"tooltip-tags\">${priceLine}</div>` : ''}
