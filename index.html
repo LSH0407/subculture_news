@@ -60,8 +60,19 @@
                 <h6 class="mb-0">게임 선택</h6>
             </div>
             <div class="card-body">
-                <div id="gameFilter" class="row g-2">
-                    <!-- 게임 체크박스들이 여기에 동적으로 생성됩니다 -->
+                <div id="gameFilter">
+                    <div class="mb-2">
+                        <div class="fw-bold small text-muted">서브컬쳐</div>
+                        <div id="subcultureFilter" class="row g-2">
+                            <!-- 서브컬쳐 체크박스 -->
+                        </div>
+                    </div>
+                    <div>
+                        <div class="fw-bold small text-muted">콘솔</div>
+                        <div id="consoleFilter" class="row g-2">
+                            <!-- 콘솔 체크박스 (Switch/Steam) -->
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-2 d-flex flex-wrap gap-2">
                     <button id="selectAll" class="btn btn-sm btn-outline-primary">전체 선택</button>
