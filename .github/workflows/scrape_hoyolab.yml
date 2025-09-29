@@ -28,20 +28,13 @@ jobs:
           pip install requests beautifulsoup4 python-dateutil selenium
           sudo apt-get update && sudo apt-get install -y jq
           
-      - name: Install Chrome and ChromeDriver
+      - name: Install Google Chrome (stable)
         run: |
-          # Chrome 설치
+          # Chrome 설치 (Selenium이 드라이버 자동 관리)
           wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
           echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
-          
-          # ChromeDriver 설치
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
-          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}")
-          wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-          sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Run HoYoLAB scraper
         env:
