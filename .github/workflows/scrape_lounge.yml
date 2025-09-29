@@ -37,12 +37,13 @@ jobs:
       - name: Log action results
         run: |
           # 로그 데이터 생성
+          CHANGES=$(git diff --numstat data/updates.json | head -1 | awk '{print $1 "+" $2 "-"}' || echo "0+0-")
           LOG_DATA=$(cat << EOF
           {
             "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "action": "naver_lounge",
             "status": "success",
-            "changes": $(git diff --numstat data/updates.json | head -1 | awk '{print $1 "+" $2 "-"}'),
+            "changes": "$CHANGES",
             "commit": "$(git rev-parse HEAD)",
             "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
           }
