@@ -40,7 +40,7 @@ jobs:
         env:
           HOYOLAB_ZZZ_AUTHOR: '219270333'
           HOYOLAB_SR_AUTHOR: '172534910'
-          HOYOLAB_LIMIT: '20'
+          HOYOLAB_LIMIT: '50'
         run: |
           python scripts/scrape_hoyolab.py
           
