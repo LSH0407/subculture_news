@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from typing import List, Dict
 
@@ -17,7 +17,7 @@ def parse_list(max_pages: int = 3) -> List[Dict]:
     headers = {"User-Agent": "Mozilla/5.0 (compatible; subculture-news/1.0)"}
     results: List[Dict] = []
     for page in range(1, max_pages + 1):
-        html = requests.get(URL.format(page=page), headers=headers, timeout=30)
+        html = requests.get(URL.format(page=page), headers=headers, timeout=60)
         html.raise_for_status()
         soup = BeautifulSoup(html.text, "html.parser")
         for row in soup.select("a.search_result_row"):
@@ -114,7 +114,7 @@ def fetch_appdetails(appid: str) -> Dict:
         "l": "koreana",
     }
     headers = {"User-Agent": "Mozilla/5.0 (compatible; subculture-news/1.0)"}
-    res = requests.get(APPDETAILS_URL, params=params, headers=headers, timeout=30)
+    res = requests.get(APPDETAILS_URL, params=params, headers=headers, timeout=60)
     res.raise_for_status()
     data = res.json()
     return data.get(appid, {}).get("data", {})
@@ -124,7 +124,7 @@ def fetch_store_tags(appid: str) -> List[str]:
     try:
         url = f"https://store.steampowered.com/app/{appid}/?l=koreana&cc=kr"
         headers = {"User-Agent": "Mozilla/5.0 (compatible; subculture-news/1.0)"}
-        res = requests.get(url, headers=headers, timeout=30)
+        res = requests.get(url, headers=headers, timeout=60)
         res.raise_for_status()
         
         soup = BeautifulSoup(res.text, "html.parser")
@@ -219,7 +219,7 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
 def main():
     # 당일 기준 롤링 개월 수 계산 (기본 3개월)
     rolling = int(os.getenv("ROLLING_MONTHS", "3"))
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     months = [(now + relativedelta(months=i)).month for i in range(max(1, rolling))]
     entries = parse_list(max_pages=int(os.getenv("MAX_PAGES", "10")))
     updates = to_updates(entries, months)
