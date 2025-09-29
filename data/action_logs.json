@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "timestamp": "2025-09-29T04:37:21Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "a4e83abe9277253191ed7b57ea1e391d7eb3f0dd",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  }
+]
