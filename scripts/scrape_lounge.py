@@ -258,20 +258,28 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
             ver_match = re.search(r"(\d+(?:\.\d+)?)\s*버전", p["title"] + " " + body)
             ver = ver_match.group(1) if ver_match else ""
             
-            # 시작일이 없고 "업데이트 이후"가 있는 경우
-            if not start and end and "업데이트 이후" in body:
-                # 버전 정보가 있으면 버전 업데이트 공지에서 찾기
-                if ver:
-                    for t, post in posts_notice.items():
-                        if "업데이트 점검 사전 공지" in t and ver in t:
-                            s_iso, _ = kor_dt(post.get("body", ""))
-                            if s_iso:
-                                start = s_iso.split("T")[0]
-                                break
-                
-                # 여전히 시작일이 없으면 2.7 버전의 경우 10/9로 하드코딩 (임시)
-                if not start and ver == "2.7":
-                    start = "2025-10-09"
+            # 시작일이 없고 "X.X 버전 업데이트 이후"가 있는 경우
+            if not start and end and "업데이트 이후" in body and ver:
+                # "X.X 버전 업데이트 점검 사전 공지" 게시글에서 점검 종료 시간 찾기
+                for t, post in posts_notice.items():
+                    if "업데이트 점검 사전 공지" in t and ver in t:
+                        notice_body = post.get("body", "")
+                        # 점검 시간 패턴: YYYY년 X월 X일 HH:MM ~ YYYY년 X월 X일 HH:MM
+                        time_pattern = re.search(
+                            r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*\d{1,2}:\d{2}\s*[~\-–—]\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*\d{1,2}:\d{2}",
+                            notice_body
+                        )
+                        if time_pattern:
+                            # 종료 시간의 날짜 사용 (연도, 월, 일)
+                            end_year = time_pattern.group(4)
+                            end_month = int(time_pattern.group(5))
+                            end_day = int(time_pattern.group(6))
+                            start = f"{end_year}-{end_month:02d}-{end_day:02d}"
+                            try:
+                                print(f"  Found version {ver} update date from notice: {start}")
+                            except Exception:
+                                pass
+                        break
                     
             if start and end:
                 # 한글 날짜 표시
