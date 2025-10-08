@@ -341,6 +341,9 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
         # "프리뷰" + "방송" 또는 "특별" + "방송" 키워드로 완화
         if ("프리뷰" in p["title"] and "방송" in p["title"]) or \
            ("특별" in p["title"] and "방송" in p["title"]):
+            # "시작됩니다"가 포함된 제목은 과거 공지이므로 스킵
+            if "시작됩니다" in p["title"]:
+                continue
             try:
                 print(f"Found broadcast post: {p['title']}")
             except Exception:
