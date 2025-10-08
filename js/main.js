@@ -345,22 +345,28 @@ async function init() {
         console.log('Creating game filter...');
         populateGameFilter(games);
         
-        // 체크박스들을 모두 선택된 상태로 설정
+        // updateView 함수를 먼저 정의 (bindControls에서 사용)
+        const updateView = () => {
+            const filtered = filterUpdates(state.updates);
+            render(filtered, gameMap);
+        };
+        
+        // 컨트롤 바인딩 (updateView를 사용)
+        bindControls(updateView);
+        
+        // 달력 설정
+        setupCalendar(gameMap);
+        
+        // 체크박스들을 모두 선택된 상태로 설정 후 렌더링
         setTimeout(() => {
             const checkboxes = document.querySelectorAll('#gameFilter input[type="checkbox"]');
             console.log('Found checkboxes:', checkboxes.length);
             checkboxes.forEach(cb => {
                 cb.checked = true;
             });
+            // 초기 렌더링
+            updateView();
         }, 200);
-        
-        const updateView = () => {
-            const filtered = filterUpdates(state.updates);
-            render(filtered, gameMap);
-        };
-        bindControls(updateView);
-        setupCalendar(gameMap);
-        updateView();
         // 범례 제거
     } catch (err) {
         const calendar = document.getElementById("calendar");
@@ -508,6 +514,7 @@ function setupCalendar(gameMap) {
     
     console.log('Setting up calendar...');
     state.calendar = new FullCalendar.Calendar(el, {
+        locale: 'ko', // 한국어 로케일 설정
         initialView: 'dayGridMonth',
         headerToolbar: {
             left: 'prev,next today',
