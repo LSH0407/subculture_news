@@ -360,13 +360,15 @@ async function init() {
         // 컨트롤 바인딩 (updateView를 사용)
         bindControls(updateView);
         
-        // 체크박스들을 모두 선택된 상태로 설정 (시각적 동기화)
+        // 체크박스들을 모두 선택된 상태로 설정하고 화면 업데이트 (시각적 동기화)
         setTimeout(() => {
             const checkboxes = document.querySelectorAll('#gameFilter input[type="checkbox"]');
             console.log('Found checkboxes:', checkboxes.length);
             checkboxes.forEach(cb => {
                 cb.checked = true;
             });
+            // 초기 렌더링을 확실하게 하기 위해 updateView 호출
+            updateView();
         }, 100);
         // 범례 제거
     } catch (err) {
