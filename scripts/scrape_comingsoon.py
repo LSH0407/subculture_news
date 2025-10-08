@@ -118,8 +118,8 @@ def fetch_appdetails(appid: str) -> Dict:
     data = res.json()
     return data.get(appid, {}).get("data", {})
 
-def fetch_store_tags(appid: str) -> List[str]:
-    """Steam Store 페이지에서 태그를 직접 스크래핑"""
+def fetch_store_info(appid: str) -> dict:
+    """Steam Store 페이지에서 태그와 발매일을 직접 스크래핑 (한국 기준)"""
     try:
         url = f"https://store.steampowered.com/app/{appid}/?l=koreana&cc=kr"
         headers = {"User-Agent": "Mozilla/5.0 (compatible; subculture-news/1.0)"}
@@ -128,6 +128,7 @@ def fetch_store_tags(appid: str) -> List[str]:
         
         soup = BeautifulSoup(res.text, "html.parser")
         tags = []
+        release_date = None
         
         # 태그 요소들 찾기 (여러 선택자 시도)
         tag_selectors = [
@@ -145,14 +146,29 @@ def fetch_store_tags(appid: str) -> List[str]:
                 if tag_text and tag_text not in tags and len(tag_text) < 50:  # 너무 긴 텍스트 제외
                     tags.append(tag_text)
         
-        # 디버깅: SILENT HILL f의 경우 태그 출력
-        if appid == "2947440":
-            print(f"SILENT HILL f tags found: {tags}")
+        # 한국어로 표시된 발매일 찾기
+        release_date_selectors = [
+            ".release_date .date",
+            ".game_release_date",
+            "div.date"
+        ]
         
-        return tags
+        for selector in release_date_selectors:
+            date_el = soup.select_one(selector)
+            if date_el:
+                date_text = date_el.get_text(strip=True)
+                if date_text and date_text != "출시 예정":
+                    release_date = date_text
+                    break
+        
+        # 디버깅: 특정 게임의 경우 로그 출력
+        if appid == "2947440" or "3229870" in appid:  # SILENT HILL f, Little Nightmares III
+            print(f"App {appid}: Store release date = {release_date}, tags = {tags[:3]}")
+        
+        return {"tags": tags, "release_date": release_date}
     except Exception as e:
-        print(f"Failed to fetch store tags for {appid}: {e}")
-        return []
+        print(f"Failed to fetch store info for {appid}: {e}")
+        return {"tags": [], "release_date": None}
 
 
 def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
@@ -171,10 +187,11 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
                 details = fetch_appdetails(e["appid"])
             except Exception:
                 details = {}
-        # 태그 수집: Store 페이지에서 직접 스크래핑 우선, API 태그는 보조
-        store_tags = []
+        
+        # Store 페이지에서 태그와 발매일 수집 (한국 기준)
+        store_info = {"tags": [], "release_date": None}
         if e.get("appid"):
-            store_tags = fetch_store_tags(e["appid"])
+            store_info = fetch_store_info(e["appid"])
         
         all_tags = []
         
@@ -183,8 +200,8 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
             all_tags = ["심리적 공포", "공포", "생존 공포", "풍부한 스토리", "액션"]
         else:
             # Store 페이지 태그 우선 사용
-            if store_tags:
-                all_tags.extend(store_tags)
+            if store_info["tags"]:
+                all_tags.extend(store_info["tags"])
             else:
                 # Store 태그가 없으면 API 태그 사용
                 if details.get("genres"):
@@ -201,9 +218,25 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
         # 고해상도 헤더: appdetails의 header_image 우선 사용
         hi_res_header = details.get("header_image") if isinstance(details, dict) else None
         
-        # Steam API에서 정확한 발매일 가져오기 (한국 기준으로 표시)
+        # 발매일 우선순위: Store 페이지 (한국어) > Steam API > 원본
         final_release_date = e["release_date"]
-        if details and details.get("release_date"):
+        
+        # 1. Store 페이지에서 한국어로 표시된 발매일 사용 (최우선)
+        if store_info.get("release_date"):
+            try:
+                store_date_text = store_info["release_date"]
+                # 한국어 날짜 파싱: "2025년 10월 10일" 형식
+                store_dt = date_parser.parse(store_date_text, fuzzy=True)
+                final_release_date = store_dt.strftime("%Y-%m-%d")
+                
+                # 디버깅
+                if "Little Nightmares" in e["name"] or "풀메탈" in e["name"] or "FullMetal" in e["name"]:
+                    print(f"{e['name']}: Store KR date = {store_date_text} -> {final_release_date}")
+            except Exception as ex:
+                print(f"Failed to parse Store date for {e['name']}: {store_info.get('release_date')} - {ex}")
+        
+        # 2. Store 페이지에서 가져오지 못한 경우 Steam API 사용
+        elif details and details.get("release_date"):
             api_date_str = details["release_date"].get("date", "")
             if api_date_str:
                 try:
@@ -211,9 +244,9 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
                     api_dt = date_parser.parse(api_date_str, fuzzy=True)
                     final_release_date = api_dt.strftime("%Y-%m-%d")
                     
-                    # 디버깅: 주요 게임의 경우 로그 출력
+                    # 디버깅
                     if "Little Nightmares" in e["name"] or "풀메탈" in e["name"] or "FullMetal" in e["name"]:
-                        print(f"{e['name']}: API date = {api_date_str}, Final date = {final_release_date}")
+                        print(f"{e['name']}: API date = {api_date_str} -> {final_release_date}")
                 except Exception as ex:
                     print(f"Failed to parse API date for {e['name']}: {api_date_str} - {ex}")
         
