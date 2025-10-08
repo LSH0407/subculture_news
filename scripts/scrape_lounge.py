@@ -181,8 +181,9 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
         print(f"  {i+1}. {p['title'][:60]}")
     
     for p in broadcast_posts:
-        # "특별" + "방송" 또는 "생방송" 키워드로 완화
-        if ("특별" in p["title"] and "방송" in p["title"]) or "생방송" in p["title"]:
+        # "방송" + "사전" + "안내" 키워드로 탐지
+        if ("방송" in p["title"] and "사전" in p["title"] and "안내" in p["title"]) or \
+           ("방송" in p["title"] and "안내" in p["title"]):
             print(f"Found broadcast post: {p['title']}")
             body = p.get("body", "")
             dt_iso, _ = kor_dt(body)
