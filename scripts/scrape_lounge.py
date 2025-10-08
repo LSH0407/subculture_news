@@ -255,8 +255,18 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
                 pass
             body = p.get("body", "")
             start, end = kor_range(body)
-            ver_match = re.search(r"(\d+(?:\.\d+)?)\s*버전", p["title"] + " " + body)
-            ver = ver_match.group(1) if ver_match else ""
+            
+            # 버전 파싱: "X.X 버전 업데이트 이후" 패턴을 우선 검색
+            ver = ""
+            if "업데이트 이후" in body:
+                update_after_match = re.search(r"(\d+\.\d+)\s*버전\s*업데이트\s*이후", body)
+                if update_after_match:
+                    ver = update_after_match.group(1)
+            
+            # 버전을 못 찾았으면 일반 패턴으로 검색
+            if not ver:
+                ver_match = re.search(r"(\d+(?:\.\d+)?)\s*버전", p["title"] + " " + body)
+                ver = ver_match.group(1) if ver_match else ""
             
             # 시작일이 없고 "X.X 버전 업데이트 이후"가 있는 경우
             if not start and end and "업데이트 이후" in body and ver:

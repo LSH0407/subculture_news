@@ -65,6 +65,7 @@ body {
 .fc-daygrid-day-number {
     font-weight: 600;
     color: #495057;
+    white-space: nowrap; /* 날짜 줄바꿈 방지 */
 }
 
 .fc-day-other .fc-daygrid-day-number {
