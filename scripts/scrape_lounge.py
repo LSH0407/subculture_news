@@ -98,36 +98,35 @@ def fetch_board_posts(board_url: str, max_items: int = 20) -> List[Dict]:
     
     posts: List[Dict] = []
     
-    # 다양한 선택자로 게시글 링크 찾기
-    selectors = [
-        "a[href*='board']",
-        "a[href*='article']", 
-        ".board-list a",
-        ".post-list a",
-        ".article-list a",
-        "a"
-    ]
+    # 네이버 게임 라운지 게시글 제목 선택자 사용
+    # post_board_title 클래스로 실제 게시글 제목 링크 찾기
+    title_links = soup.find_all("a", class_=lambda x: x and "post_board_title" in x)
     
-    for selector in selectors:
-        links = soup.select(selector)
-        for a in links:
-            title = a.get_text(strip=True)
-            href = a.get("href")
-            if not title or not href or len(title) < 5:
-                continue
-            if href.startswith("/"):
-                href = f"https://game.naver.com{href}"
-            if "board" not in href and "article" not in href:
-                continue
-            # 중복 제거
-            if not any(p["url"] == href for p in posts):
-                posts.append({"title": title, "url": href})
-            if len(posts) >= max_items:
-                break
+    print(f"Found {len(title_links)} title links from {board_url}")
+    
+    for a in title_links:
+        title = a.get_text(strip=True)
+        href = a.get("href")
+        
+        if not title or not href:
+            continue
+            
+        # 상대 경로를 절대 경로로 변환
+        if href.startswith("/"):
+            href = f"https://game.naver.com{href}"
+        
+        # detail 링크만 수집 (실제 게시글)
+        if "detail" not in href:
+            continue
+        
+        # 중복 제거
+        if not any(p["url"] == href for p in posts):
+            posts.append({"title": title, "url": href})
+            
         if len(posts) >= max_items:
             break
     
-    print(f"Found {len(posts)} posts from {board_url}")
+    print(f"Collected {len(posts)} posts")
     
     # 본문 수집 (Selenium 사용)
     for p in posts:
