@@ -246,9 +246,11 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
     
     posts_notice = {p["title"]: p for p in posts_tuning}
     for p in posts_tuning:
-        # "캐릭터" + "이벤트" + "튜닝" 패턴 완화
-        if ("캐릭터" in p["title"] and "이벤트" in p["title"] and "튜닝" in p["title"]) or \
-           ("이벤트" in p["title"] and "튜닝" in p["title"]):
+        # "캐릭터 이벤트 튜닝"만 필터링 (무기 이벤트 튜닝 제외)
+        if "캐릭터" in p["title"] and "이벤트" in p["title"] and "튜닝" in p["title"]:
+            # "무기" 키워드가 있으면 제외
+            if "무기" in p["title"]:
+                continue
             try:
                 print(f"Found tuning post: {p['title']}")
             except Exception:
@@ -298,12 +300,26 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
                 end_month = int(end[5:7])
                 end_day = int(end[8:10])
                 
+                # 캐릭터 이름 추출 (「캐릭터명」 패턴)
+                char_match = re.search(r"「(.+?)」", p["title"])
+                char_name = char_match.group(1) if char_match else ""
+                
+                # 설명 구성
+                desc_parts = [
+                    f"시작일 : {start_month}월 {start_day}일",
+                    f"종료일 : {end_month}월 {end_day}일",
+                ]
+                if char_name:
+                    desc_parts.append(f"[신규] {char_name}")
+                else:
+                    desc_parts.append("[이벤트] 캐릭터 이벤트 튜닝")
+                
                 out.append({
                     "game_id": "ww",
                     "version": ver,
                     "update_date": start,
                     "end_date": end,
-                    "description": f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[이벤트] 캐릭터 이벤트 튜닝",
+                    "description": "\n".join(desc_parts),
                     "url": p["url"],
                 })
             else:
