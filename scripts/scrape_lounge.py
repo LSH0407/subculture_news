@@ -310,7 +310,7 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
                     f"종료일 : {end_month}월 {end_day}일",
                 ]
                 if char_name:
-                    desc_parts.append(f"[신규] {char_name}")
+                    desc_parts.append(f"[5성] {char_name}")
                 else:
                     desc_parts.append("[이벤트] 캐릭터 이벤트 튜닝")
                 
