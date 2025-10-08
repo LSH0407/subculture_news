@@ -1,21 +1,57 @@
 import json
 import os
 import re
+import time
 from datetime import datetime
 from typing import Dict, List, Tuple
 
 import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 KST_OFFSET = "+09:00"
 
 
+def get_selenium_driver():
+    """Selenium WebDriver 설정"""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (compatible; subculture-news/1.0)")
+    
+    driver = webdriver.Chrome(options=chrome_options)
+    return driver
+
 def get(url: str) -> BeautifulSoup:
+    """기존 requests 방식 (fallback)"""
     headers = {"User-Agent": "Mozilla/5.0 (compatible; subculture-news/1.0)"}
     r = requests.get(url, headers=headers, timeout=30)
     r.raise_for_status()
     return BeautifulSoup(r.text, "html.parser")
+
+def get_with_selenium(url: str, wait_time: int = 10) -> BeautifulSoup:
+    """Selenium을 사용한 JavaScript 렌더링"""
+    driver = get_selenium_driver()
+    try:
+        driver.get(url)
+        # 페이지 로딩 대기
+        WebDriverWait(driver, wait_time).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        # 추가 대기 (동적 콘텐츠 로딩)
+        time.sleep(3)
+        html = driver.page_source
+        return BeautifulSoup(html, "html.parser")
+    finally:
+        driver.quit()
 
 
 def kor_dt(text: str) -> Tuple[str, str]:
@@ -43,28 +79,57 @@ def kor_range(text: str) -> Tuple[str, str]:
 
 
 def fetch_board_posts(board_url: str, max_items: int = 20) -> List[Dict]:
-    soup = get(board_url)
+    """게시판 게시글 수집 (Selenium 사용)"""
+    try:
+        # Selenium으로 JavaScript 렌더링된 페이지 가져오기
+        soup = get_with_selenium(board_url)
+    except Exception as e:
+        print(f"Selenium failed for {board_url}, falling back to requests: {e}")
+        # Fallback to requests
+        soup = get(board_url)
+    
     posts: List[Dict] = []
-    # 라운지 HTML이 종종 바뀌므로 범용적으로 a 태그 수집
-    for a in soup.select("a"):
-        title = a.get_text(strip=True)
-        href = a.get("href")
-        if not title or not href:
-            continue
-        if href.startswith("/"):
-            href = f"https://game.naver.com{href}"
-        if "board" not in href and "article" not in href:
-            continue
-        posts.append({"title": title, "url": href})
+    
+    # 다양한 선택자로 게시글 링크 찾기
+    selectors = [
+        "a[href*='board']",
+        "a[href*='article']", 
+        ".board-list a",
+        ".post-list a",
+        ".article-list a",
+        "a"
+    ]
+    
+    for selector in selectors:
+        links = soup.select(selector)
+        for a in links:
+            title = a.get_text(strip=True)
+            href = a.get("href")
+            if not title or not href or len(title) < 5:
+                continue
+            if href.startswith("/"):
+                href = f"https://game.naver.com{href}"
+            if "board" not in href and "article" not in href:
+                continue
+            # 중복 제거
+            if not any(p["url"] == href for p in posts):
+                posts.append({"title": title, "url": href})
+            if len(posts) >= max_items:
+                break
         if len(posts) >= max_items:
             break
-    # 본문 수집
+    
+    print(f"Found {len(posts)} posts from {board_url}")
+    
+    # 본문 수집 (Selenium 사용)
     for p in posts:
         try:
-            ps = get(p["url"])  # 단순 텍스트 파싱
+            ps = get_with_selenium(p["url"], wait_time=5)
             p["body"] = ps.get_text("\n", strip=True)
-        except Exception:
+        except Exception as e:
+            print(f"Failed to get body for {p['url']}: {e}")
             p["body"] = ""
+    
     return posts
 
 
