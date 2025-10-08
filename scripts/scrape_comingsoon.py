@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from dateutil.relativedelta import relativedelta
 from typing import List, Dict
 
@@ -72,7 +72,10 @@ def parse_list(max_pages: int = 3) -> List[Dict]:
             # normalize
             try:
                 release_dt = date_parser.parse(date_txt, fuzzy=True)
-                date_str = release_dt.strftime("%Y-%m-%d")
+                # Steam 발매 시간은 보통 PST 오전 10시 (한국 시간 다음날 새벽 2-3시)
+                # 한국 기준으로 표시하기 위해 +1일 추가
+                release_dt_kst = release_dt + timedelta(days=1)
+                date_str = release_dt_kst.strftime("%Y-%m-%d")
             except Exception:
                 # keep original if parsing failed
                 date_str = date_txt or "TBA"
