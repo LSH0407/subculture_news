@@ -63,16 +63,34 @@ def get_with_selenium(url: str, wait_time: int = 10) -> BeautifulSoup:
 
 
 def kor_dt(text: str) -> Tuple[str, str]:
+    # 패턴 1: X월 X일(요일) HH:MM (가장 일반적)
+    m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*\([^)]+\)\s*(\d{1,2}):(\d{2})", text)
+    if m:
+        mm, dd, hh, mi = m.group(1), m.group(2), m.group(3), m.group(4)
+        year = datetime.now().year
+        return f"{year}-{int(mm):02d}-{int(dd):02d}T{int(hh):02d}:{int(mi):02d}:00{KST_OFFSET}", f"{int(mm)}/{int(dd)} {int(hh):02d}:{int(mi):02d}"
+    
+    # 패턴 2: X/X(요일) HH:MM
+    m = re.search(r"(\d{1,2})/(\d{1,2})\s*\([^)]+\)\s*(\d{1,2}):(\d{2})", text)
+    if m:
+        mm, dd, hh, mi = m.group(1), m.group(2), m.group(3), m.group(4)
+        year = datetime.now().year
+        return f"{year}-{int(mm):02d}-{int(dd):02d}T{int(hh):02d}:{int(mi):02d}:00{KST_OFFSET}", f"{int(mm)}/{int(dd)} {int(hh):02d}:{int(mi):02d}"
+    
+    # 패턴 3: X월 X일 HH:MM (KST) - 기존 패턴
     m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*(\d{1,2})(?::(\d{2}))?\s*\(K?ST\)?", text)
     if m:
         mm, dd, hh, mi = m.group(1), m.group(2), m.group(3), m.group(4) or "00"
         year = datetime.now().year
         return f"{year}-{int(mm):02d}-{int(dd):02d}T{int(hh):02d}:{int(mi):02d}:00{KST_OFFSET}", f"{int(mm)}/{int(dd)} {int(hh):02d}:{int(mi):02d}"
+    
+    # 패턴 4: X월 X일만 (시간 없음)
     m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일", text)
     if m:
         mm, dd = m.group(1), m.group(2)
         year = datetime.now().year
         return f"{year}-{int(mm):02d}-{int(dd):02d}", f"{int(mm)}/{int(dd)}"
+    
     return "", ""
 
 
