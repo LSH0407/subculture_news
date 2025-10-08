@@ -144,9 +144,12 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
     out: List[Dict] = []
     # 업데이트 소식 사전 안내 - 모집
     update_posts = fetch_board_posts(board_update_url, limit)
-    print(f"Nikke update board posts: {len(update_posts)}")
-    for i, p in enumerate(update_posts[:3]):
-        print(f"  {i+1}. {p['title'][:60]}")
+    try:
+        print(f"Nikke update board posts: {len(update_posts)}")
+        for i, p in enumerate(update_posts[:3]):
+            print(f"  {i+1}. {p['title'][:60]}")
+    except Exception:
+        pass  # 인코딩 오류 무시
     
     for p in update_posts:
         if "업데이트 소식 사전 안내" in p["title"] and "모집에 합류" in p.get("body", ""):
@@ -175,15 +178,21 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
     
     # 특별 방송 안내 (패턴 완화)
     broadcast_posts = fetch_board_posts(board_broadcast_url, limit)
-    print(f"Nikke broadcast board posts: {len(broadcast_posts)}")
-    for i, p in enumerate(broadcast_posts[:3]):
-        print(f"  {i+1}. {p['title'][:60]}")
+    try:
+        print(f"Nikke broadcast board posts: {len(broadcast_posts)}")
+        for i, p in enumerate(broadcast_posts[:3]):
+            print(f"  {i+1}. {p['title'][:60]}")
+    except Exception:
+        pass  # 인코딩 오류 무시
     
     for p in broadcast_posts:
         # "방송" + "사전" + "안내" 키워드로 탐지
         if ("방송" in p["title"] and "사전" in p["title"] and "안내" in p["title"]) or \
            ("방송" in p["title"] and "안내" in p["title"]):
-            print(f"Found broadcast post: {p['title']}")
+            try:
+                print(f"Found broadcast post: {p['title']}")
+            except Exception:
+                pass
             body = p.get("body", "")
             dt_iso, _ = kor_dt(body)
             if dt_iso:
@@ -195,23 +204,32 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
                     "url": p["url"],
                 })
             else:
-                print(f"  No date found in body (length: {len(body)})")
+                try:
+                    print(f"  No date found in body (length: {len(body)})")
+                except Exception:
+                    pass
     return out
 
 
 def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -> List[Dict]:
     out: List[Dict] = []
     posts_tuning = fetch_board_posts(board_tuning_url, limit)
-    print(f"WW tuning board posts: {len(posts_tuning)}")
-    for i, p in enumerate(posts_tuning[:3]):
-        print(f"  {i+1}. {p['title'][:60]}")
+    try:
+        print(f"WW tuning board posts: {len(posts_tuning)}")
+        for i, p in enumerate(posts_tuning[:3]):
+            print(f"  {i+1}. {p['title'][:60]}")
+    except Exception:
+        pass  # 인코딩 오류 무시
     
     posts_notice = {p["title"]: p for p in posts_tuning}
     for p in posts_tuning:
         # "캐릭터" + "이벤트" + "튜닝" 패턴 완화
         if ("캐릭터" in p["title"] and "이벤트" in p["title"] and "튜닝" in p["title"]) or \
            ("이벤트" in p["title"] and "튜닝" in p["title"]):
-            print(f"Found tuning post: {p['title']}")
+            try:
+                print(f"Found tuning post: {p['title']}")
+            except Exception:
+                pass
             body = p.get("body", "")
             start, end = kor_range(body)
             ver_match = re.search(r"(\d+(?:\.\d+)?)\s*버전", p["title"] + " " + body)
@@ -234,19 +252,28 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
                     "url": p["url"],
                 })
             else:
-                print(f"  No date range found (start={start}, end={end})")
+                try:
+                    print(f"  No date range found (start={start}, end={end})")
+                except Exception:
+                    pass
 
     # 프리뷰 특별 방송 (패턴 완화)
     broadcast_posts = fetch_board_posts(board_broadcast_url, limit)
-    print(f"WW broadcast board posts: {len(broadcast_posts)}")
-    for i, p in enumerate(broadcast_posts[:3]):
-        print(f"  {i+1}. {p['title'][:60]}")
+    try:
+        print(f"WW broadcast board posts: {len(broadcast_posts)}")
+        for i, p in enumerate(broadcast_posts[:3]):
+            print(f"  {i+1}. {p['title'][:60]}")
+    except Exception:
+        pass  # 인코딩 오류 무시
     
     for p in broadcast_posts:
         # "프리뷰" + "방송" 또는 "특별" + "방송" 키워드로 완화
         if ("프리뷰" in p["title"] and "방송" in p["title"]) or \
            ("특별" in p["title"] and "방송" in p["title"]):
-            print(f"Found broadcast post: {p['title']}")
+            try:
+                print(f"Found broadcast post: {p['title']}")
+            except Exception:
+                pass
             dt_iso, _ = kor_dt(p.get("body", ""))
             if dt_iso:
                 out.append({
@@ -257,7 +284,10 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
                     "url": p["url"],
                 })
             else:
-                print(f"  No date found in body (length: {len(p.get('body', ''))})")
+                try:
+                    print(f"  No date found in body (length: {len(p.get('body', ''))})")
+                except Exception:
+                    pass
     return out
 
 
