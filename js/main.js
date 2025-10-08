@@ -522,14 +522,34 @@ function setupCalendar(gameMap) {
             center: 'title',
             right: 'dayGridMonth,listMonth'
         },
-        // 이벤트 정렬: 기본적으로 시간순, 동일 시간일 때 플랫폼 우선순위 (모바일/고정 게임 우선, Steam/Switch 후순위)
+        // 이벤트 정렬: 게임 선택 필터 순서대로
         eventOrder: (a, b) => {
-            const pa = (a.extendedProps?.platform || '').toLowerCase();
-            const pb = (b.extendedProps?.platform || '').toLowerCase();
-            const weight = (p) => (p === 'steam' || p === 'switch') ? 1 : 0; // 1이면 후순위
-            const dw = weight(pa) - weight(pb);
-            if (dw !== 0) return dw; // Steam/Switch를 뒤로
-            // 같으면 제목 사전순
+            // 게임 ID 우선순위 정의 (필터에 나오는 순서)
+            const gameOrder = ['nikke', 'ww', 'genshin', 'star_rail', 'zzz', 'switch', 'steam'];
+            
+            const getGameOrder = (gameId) => {
+                if (!gameId) return 999;
+                // Steam 게임
+                if (String(gameId).startsWith('steam_')) return 6;
+                // Switch 게임 (platform으로 판별 필요)
+                const idx = gameOrder.indexOf(gameId);
+                return idx >= 0 ? idx : 999;
+            };
+            
+            const orderA = getGameOrder(a.extendedProps?.gameId);
+            const orderB = getGameOrder(b.extendedProps?.gameId);
+            
+            // Switch 플랫폼 체크
+            const platformA = a.extendedProps?.platform;
+            const platformB = b.extendedProps?.platform;
+            const finalOrderA = platformA === 'switch' ? 5 : orderA;
+            const finalOrderB = platformB === 'switch' ? 5 : orderB;
+            
+            if (finalOrderA !== finalOrderB) {
+                return finalOrderA - finalOrderB;
+            }
+            
+            // 같은 게임이면 제목 사전순
             return (a.title || '').localeCompare(b.title || '');
         },
         dayMaxEventRows: 10, // 최대 10개 행까지 표시
