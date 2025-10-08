@@ -351,22 +351,23 @@ async function init() {
             render(filtered, gameMap);
         };
         
-        // 컨트롤 바인딩 (updateView를 사용)
-        bindControls(updateView);
-        
         // 달력 설정
         setupCalendar(gameMap);
         
-        // 체크박스들을 모두 선택된 상태로 설정 후 렌더링
+        // 초기 렌더링 (먼저 실행)
+        updateView();
+        
+        // 컨트롤 바인딩 (updateView를 사용)
+        bindControls(updateView);
+        
+        // 체크박스들을 모두 선택된 상태로 설정 (시각적 동기화)
         setTimeout(() => {
             const checkboxes = document.querySelectorAll('#gameFilter input[type="checkbox"]');
             console.log('Found checkboxes:', checkboxes.length);
             checkboxes.forEach(cb => {
                 cb.checked = true;
             });
-            // 초기 렌더링
-            updateView();
-        }, 200);
+        }, 100);
         // 범례 제거
     } catch (err) {
         const calendar = document.getElementById("calendar");
