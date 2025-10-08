@@ -326,17 +326,16 @@ async function init() {
         
         // 초기에 모든 게임을 선택된 상태로 설정
         const allGameIds = new Set();
-        // games.json의 모든 게임들 추가
+        // 서브컬처 게임들만 개별적으로 추가 (games.json의 게임들)
         games.forEach(game => {
-            allGameIds.add(game.id);
+            // Steam이나 Switch 게임이 아닌 경우만 개별적으로 추가
+            if (!game.id.startsWith('steam_') && game.id !== 'switch_all') {
+                allGameIds.add(game.id);
+            }
         });
-        // updates.json의 모든 게임들 추가
-        state.updates.forEach(update => {
-            allGameIds.add(update.game_id);
-        });
-        // Steam 게임 카테고리도 추가
+        // Steam 게임 카테고리 추가 (개별 Steam 게임은 추가하지 않음)
         allGameIds.add('steam_all');
-        // Switch 게임 카테고리도 추가
+        // Switch 게임 카테고리 추가 (개별 Switch 게임은 추가하지 않음)
         allGameIds.add('switch_all');
         state.selectedGames = allGameIds;
         console.log('Selected games count:', state.selectedGames.size);
