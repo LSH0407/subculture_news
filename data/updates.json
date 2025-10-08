@@ -13779,5 +13779,44 @@
     "update_date": "2025-10-25",
     "description": "특별 방송",
     "url": "https://game.naver.com/lounge/nikke/board/detail/6767886"
+  },
+  {
+    "game_id": "ww",
+    "version": "2.7",
+    "update_date": "2025-10-09",
+    "end_date": "2025-10-30",
+    "description": "시작일 : 10월 9일\n종료일 : 10월 30일\n[이벤트] 캐릭터 이벤트 튜닝",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/6768016"
+  },
+  {
+    "game_id": "ww",
+    "version": "2.7",
+    "update_date": "2025-10-09",
+    "end_date": "2025-10-30",
+    "description": "시작일 : 10월 9일\n종료일 : 10월 30일\n[이벤트] 캐릭터 이벤트 튜닝",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/6767999"
+  },
+  {
+    "game_id": "ww",
+    "version": "2.7",
+    "update_date": "2025-10-09",
+    "end_date": "2025-10-30",
+    "description": "시작일 : 10월 9일\n종료일 : 10월 30일\n[이벤트] 캐릭터 이벤트 튜닝",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/6768000"
+  },
+  {
+    "game_id": "ww",
+    "version": "2.7",
+    "update_date": "2025-10-09",
+    "end_date": "2025-10-30",
+    "description": "시작일 : 10월 9일\n종료일 : 10월 30일\n[이벤트] 캐릭터 이벤트 튜닝",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/6767962"
+  },
+  {
+    "game_id": "ww",
+    "version": "",
+    "update_date": "2025-10-09",
+    "description": "프리뷰 특별 방송",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/6718010"
   }
 ]
