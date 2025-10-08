@@ -69,13 +69,10 @@ def parse_list(max_pages: int = 3) -> List[Dict]:
                     all_imgs = row.select("img")
                     print(f"All img elements: {[img.get('src', '') for img in all_imgs]}")
 
-            # normalize
+            # normalize - 일단 원본 날짜 그대로 저장 (나중에 API로 정확한 날짜 확인)
             try:
                 release_dt = date_parser.parse(date_txt, fuzzy=True)
-                # Steam 발매 시간은 보통 PST 오전 10시 (한국 시간 다음날 새벽 2-3시)
-                # 한국 기준으로 표시하기 위해 +1일 추가
-                release_dt_kst = release_dt + timedelta(days=1)
-                date_str = release_dt_kst.strftime("%Y-%m-%d")
+                date_str = release_dt.strftime("%Y-%m-%d")
             except Exception:
                 # keep original if parsing failed
                 date_str = date_txt or "TBA"
@@ -112,7 +109,6 @@ def parse_list(max_pages: int = 3) -> List[Dict]:
 def fetch_appdetails(appid: str) -> Dict:
     params = {
         "appids": appid,
-        "filters": "basic,genres,categories",
         "cc": "KR",
         "l": "koreana",
     }
@@ -204,10 +200,27 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
         summary = details.get("short_description", "")
         # 고해상도 헤더: appdetails의 header_image 우선 사용
         hi_res_header = details.get("header_image") if isinstance(details, dict) else None
+        
+        # Steam API에서 정확한 발매일 가져오기 (한국 기준으로 표시)
+        final_release_date = e["release_date"]
+        if details and details.get("release_date"):
+            api_date_str = details["release_date"].get("date", "")
+            if api_date_str:
+                try:
+                    # Steam API 날짜 형식: "9 Oct, 2025" 또는 "Oct 9, 2025"
+                    api_dt = date_parser.parse(api_date_str, fuzzy=True)
+                    final_release_date = api_dt.strftime("%Y-%m-%d")
+                    
+                    # 디버깅: 주요 게임의 경우 로그 출력
+                    if "Little Nightmares" in e["name"] or "풀메탈" in e["name"] or "FullMetal" in e["name"]:
+                        print(f"{e['name']}: API date = {api_date_str}, Final date = {final_release_date}")
+                except Exception as ex:
+                    print(f"Failed to parse API date for {e['name']}: {api_date_str} - {ex}")
+        
         updates.append({
             "game_id": f"steam_{e['appid']}" if e.get("appid") else f"coming_{e['name']}",
             "version": "",
-            "update_date": e["release_date"],
+            "update_date": final_release_date,
             "description": f"발매예정 · {e['genres']}",
             "name": e["name"],
             "url": e.get("url", ""),
