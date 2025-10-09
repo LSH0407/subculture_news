@@ -326,5 +326,13 @@
     "changes": "1401+657-",
     "commit": "adf769c44d65497eee8bb64d7e65408d32a5d4c2",
     "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-10-09T03:29:30Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1473+669-",
+    "commit": "ad7f23020e85aaca586798467a0f935b9f9c8ccf",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
   }
 ]
