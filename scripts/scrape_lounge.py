@@ -31,10 +31,24 @@ def get_selenium_driver():
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
+    # GitHub Actions 환경을 위한 추가 옵션
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-plugins")
+    chrome_options.add_argument("--disable-images")
+    chrome_options.add_argument("--remote-debugging-port=9223")  # 다른 포트 사용
+    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("--disable-background-timer-throttling")
+    chrome_options.add_argument("--disable-renderer-backgrounding")
+    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
     
-    # webdriver-manager를 사용하여 ChromeDriver 자동 관리
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    try:
+        # webdriver-manager를 사용하여 ChromeDriver 자동 관리
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+    except Exception as e:
+        print(f"WebDriver Manager failed, trying default: {e}")
+        driver = webdriver.Chrome(options=chrome_options)
+    
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     return driver
 

@@ -26,7 +26,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4 python-dateutil selenium webdriver-manager
-          sudo apt-get update && sudo apt-get install -y jq wget unzip
+          sudo apt-get update && sudo apt-get install -y jq wget unzip xvfb
           
       - name: Install Chrome
         run: |
@@ -34,12 +34,22 @@ jobs:
           sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
+          # Chrome 헤드리스 모드를 위한 추가 설정
+          export DISPLAY=:99
+          sudo Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
       - name: Run Lounge scraper
         env:
           LOUNGE_LIMIT: '20'
         run: |
+          echo "=== Starting Naver Game Lounge scraper ==="
+          echo "Python version: $(python --version)"
+          echo "Chrome version: $(google-chrome --version)"
+          echo "Environment variables:"
+          echo "  LOUNGE_LIMIT: $LOUNGE_LIMIT"
+          echo "=== Running scraper ==="
           python scripts/scrape_lounge.py
+          echo "=== Scraper completed ==="
           
       - name: Log action results
         run: |

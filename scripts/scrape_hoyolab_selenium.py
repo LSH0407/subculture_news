@@ -31,8 +31,25 @@ def setup_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (compatible; subculture-news/1.0)")
+    # GitHub Actions 환경을 위한 추가 옵션
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-plugins")
+    chrome_options.add_argument("--disable-images")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("--disable-background-timer-throttling")
+    chrome_options.add_argument("--disable-renderer-backgrounding")
+    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
     
-    driver = webdriver.Chrome(options=chrome_options)
+    try:
+        from webdriver_manager.chrome import ChromeDriverManager
+        from selenium.webdriver.chrome.service import Service
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+    except Exception as e:
+        print(f"WebDriver Manager failed, trying default: {e}")
+        driver = webdriver.Chrome(options=chrome_options)
+    
     return driver
 
 
