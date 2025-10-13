@@ -31,15 +31,17 @@ def get_selenium_driver():
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
-    # GitHub Actions 환경을 위한 추가 옵션
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--disable-plugins")
-    chrome_options.add_argument("--disable-images")
-    chrome_options.add_argument("--remote-debugging-port=9223")  # 다른 포트 사용
-    chrome_options.add_argument("--single-process")
-    chrome_options.add_argument("--disable-background-timer-throttling")
-    chrome_options.add_argument("--disable-renderer-backgrounding")
-    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
+    # 환경에 따른 추가 옵션 (GitHub Actions에서만 적용)
+    import os
+    if os.getenv('GITHUB_ACTIONS'):
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-plugins")
+        chrome_options.add_argument("--disable-images")
+        chrome_options.add_argument("--remote-debugging-port=9223")  # 다른 포트 사용
+        chrome_options.add_argument("--single-process")
+        chrome_options.add_argument("--disable-background-timer-throttling")
+        chrome_options.add_argument("--disable-renderer-backgrounding")
+        chrome_options.add_argument("--disable-backgrounding-occluded-windows")
     
     try:
         # webdriver-manager를 사용하여 ChromeDriver 자동 관리
@@ -295,10 +297,31 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
                     dates = re.findall(r"(\d{1,2})월\s*(\d{1,2})일", body)
                     print(f"  Found {len(dates)} date patterns: {dates}")
                     if len(dates) >= 2:
-                        y = datetime.now().year
-                        s = f"{y}-{int(dates[0][0]):02d}-{int(dates[0][1]):02d}"
-                        e = f"{y}-{int(dates[1][0]):02d}-{int(dates[1][1]):02d}"
-                        print(f"  Constructed date range: {s} ~ {e}")
+                        # 특수모집 관련 날짜만 찾기 (너무 많은 날짜가 있으면 제한)
+                        if len(dates) > 10:
+                            print(f"  Too many dates found ({len(dates)}), skipping automatic date parsing")
+                            # 수동으로 특수모집 관련 날짜 찾기
+                            recruit_section = ""
+                            if "특수 모집" in body:
+                                idx = body.find("특수 모집")
+                                recruit_section = body[max(0, idx-200):idx+500]
+                            elif "모집에 합류" in body:
+                                idx = body.find("모집에 합류")
+                                recruit_section = body[max(0, idx-200):idx+500]
+                            
+                            if recruit_section:
+                                recruit_dates = re.findall(r"(\d{1,2})월\s*(\d{1,2})일", recruit_section)
+                                print(f"  Found {len(recruit_dates)} dates in recruit section: {recruit_dates}")
+                                if len(recruit_dates) >= 2:
+                                    y = datetime.now().year
+                                    s = f"{y}-{int(recruit_dates[0][0]):02d}-{int(recruit_dates[0][1]):02d}"
+                                    e = f"{y}-{int(recruit_dates[1][0]):02d}-{int(recruit_dates[1][1]):02d}"
+                                    print(f"  Constructed date range from recruit section: {s} ~ {e}")
+                        else:
+                            y = datetime.now().year
+                            s = f"{y}-{int(dates[0][0]):02d}-{int(dates[0][1]):02d}"
+                            e = f"{y}-{int(dates[1][0]):02d}-{int(dates[1][1]):02d}"
+                            print(f"  Constructed date range: {s} ~ {e}")
                 
                 if s and e:
                     # 한글 날짜 표시
@@ -306,6 +329,11 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
                     start_day = int(s[8:10])
                     end_month = int(e[5:7])
                     end_day = int(e[8:10])
+                    
+                    # 캐릭터명이 너무 길면 자르기 (전체 본문이 들어가는 것 방지)
+                    if len(recruit) > 100:
+                        recruit = "특수모집"
+                        print(f"  Recruit name too long, using default")
                     
                     result = {
                         "game_id": "nikke",

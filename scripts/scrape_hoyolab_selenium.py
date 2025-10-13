@@ -31,15 +31,17 @@ def setup_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (compatible; subculture-news/1.0)")
-    # GitHub Actions 환경을 위한 추가 옵션
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--disable-plugins")
-    chrome_options.add_argument("--disable-images")
-    chrome_options.add_argument("--remote-debugging-port=9222")
-    chrome_options.add_argument("--single-process")
-    chrome_options.add_argument("--disable-background-timer-throttling")
-    chrome_options.add_argument("--disable-renderer-backgrounding")
-    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
+    # 환경에 따른 추가 옵션 (GitHub Actions에서만 적용)
+    import os
+    if os.getenv('GITHUB_ACTIONS'):
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-plugins")
+        chrome_options.add_argument("--disable-images")
+        chrome_options.add_argument("--remote-debugging-port=9222")
+        chrome_options.add_argument("--single-process")
+        chrome_options.add_argument("--disable-background-timer-throttling")
+        chrome_options.add_argument("--disable-renderer-backgrounding")
+        chrome_options.add_argument("--disable-backgrounding-occluded-windows")
     
     try:
         from webdriver_manager.chrome import ChromeDriverManager
@@ -316,14 +318,22 @@ def parse_zzz_selenium(posts: List[Dict]) -> List[Dict]:
         
         print(f"Processing ZZZ: {title}")
         
-        # 특별 방송 예고
-        if "특별 방송 예고" in title:
+        # 특별 방송 예고 (패턴 확장)
+        if ("특별 방송 예고" in title) or ("특별 방송" in title and "예고" in title):
             print(f"  -> 특별 방송 예고 발견!")
             dt_iso, md = find_korean_datetime(body)
             if not dt_iso:
                 dt_iso, md = find_korean_datetime(title)
             
-            if dt_iso and ver:
+            # 날짜가 없어도 버전이 있으면 추가 (최신 게시물이므로)
+            if ver:
+                if not dt_iso:
+                    # 현재 날짜 사용
+                    from datetime import datetime
+                    now = datetime.now()
+                    dt_iso = now.strftime("%Y-%m-%dT%H:%M:00+09:00")
+                    print(f"  -> 날짜 없음, 현재 시간 사용: {dt_iso}")
+                
                 results.append({
                     "game_id": "zzz",
                     "version": ver,
@@ -333,35 +343,72 @@ def parse_zzz_selenium(posts: List[Dict]) -> List[Dict]:
                 })
                 print(f"  -> 추가됨: {ver} 버전 특별 방송 ({dt_iso})")
             else:
-                print(f"  -> 날짜 또는 버전 정보 없음")
+                print(f"  -> 버전 정보 없음")
             continue
             
-        # 기간 한정 채널(상/하)
+        # 기간 한정 채널(상/하/상반기/하반기)
         if "기간 한정 채널" in title and ver:
             print(f"  -> 기간 한정 채널 발견!")
-            if "상)" in title or "(상" in title:
+            channel_type = ""
+            if "상)" in title or "(상" in title or "상반기" in title:
+                channel_type = "상"
                 start = version_to_update_date.get(ver, "")
                 _, end = find_korean_daterange(body)
+                
+                # 날짜가 없으면 현재 날짜 사용
+                if not start:
+                    from datetime import datetime
+                    start = datetime.now().strftime("%Y-%m-%d")
+                    print(f"  -> 시작일 없음, 현재 날짜 사용: {start}")
+                
+                if not end:
+                    # 대략적인 종료일 설정 (3개월 후)
+                    from datetime import datetime, timedelta
+                    end_date = datetime.now() + timedelta(days=90)
+                    end = end_date.strftime("%Y-%m-%d")
+                    print(f"  -> 종료일 없음, 추정 날짜 사용: {end}")
+                
                 if start and end:
                     results.append({
                         "game_id": "zzz",
                         "version": ver,
                         "update_date": start,
                         "end_date": end,
-                        "description": build_desc(start.replace("2025-", "").replace("2024-", ""), end.replace("2025-", "").replace("2024-", ""), ["[이벤트] 기간 한정 채널(상)"]),
+                        "description": build_desc(start.replace("2025-", "").replace("2024-", ""), end.replace("2025-", "").replace("2024-", ""), ["[이벤트] 기간 한정 채널(상반기)"]),
                         "url": url,
                     })
-            elif "하)" in title or "(하" in title:
+                    print(f"  -> 추가됨: 기간 한정 채널(상반기) ({start} ~ {end})")
+                    
+            elif "하)" in title or "(하" in title or "하반기" in title:
+                channel_type = "하"
                 start, end = find_korean_daterange(body)
+                
+                # 날짜가 없으면 현재 날짜 사용
+                if not start:
+                    from datetime import datetime
+                    start = datetime.now().strftime("%Y-%m-%d")
+                    print(f"  -> 시작일 없음, 현재 날짜 사용: {start}")
+                
+                if not end:
+                    # 대략적인 종료일 설정 (3개월 후)
+                    from datetime import datetime, timedelta
+                    end_date = datetime.now() + timedelta(days=90)
+                    end = end_date.strftime("%Y-%m-%d")
+                    print(f"  -> 종료일 없음, 추정 날짜 사용: {end}")
+                
                 if start and end:
                     results.append({
                         "game_id": "zzz",
                         "version": ver,
                         "update_date": start,
                         "end_date": end,
-                        "description": build_desc(start.replace("2025-", "").replace("2024-", ""), end.replace("2025-", "").replace("2024-", ""), ["[이벤트] 기간 한정 채널(하)"]),
+                        "description": build_desc(start.replace("2025-", "").replace("2024-", ""), end.replace("2025-", "").replace("2024-", ""), ["[이벤트] 기간 한정 채널(하반기)"]),
                         "url": url,
                     })
+                    print(f"  -> 추가됨: 기간 한정 채널(하반기) ({start} ~ {end})")
+            
+            if not channel_type:
+                print(f"  -> 채널 타입 미확인: {title}")
     
     return results
 
