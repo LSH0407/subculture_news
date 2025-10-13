@@ -251,6 +251,13 @@ def fetch_posts_selenium(author_id: str, limit: int = 20) -> List[Dict]:
 
 def find_korean_datetime(text: str) -> Tuple[str, str]:
     """한국어 날짜/시간 형식 파싱"""
+    # ex: 2025/10/15 07:00(KST) 패턴
+    m = re.search(r"(\d{4})/(\d{1,2})/(\d{1,2})\s+(\d{1,2}):(\d{2})\s*\(KST\)", text)
+    if m:
+        yyyy, mm, dd, hh, mi = map(int, m.groups())
+        dt = datetime(yyyy, mm, dd, hh, mi)
+        return dt.strftime("%Y-%m-%dT%H:%M:00+09:00"), f"{mm}/{dd} {hh:02d}:{mi:02d}"
+    
     # ex: 8월 22일 20:30(KST)
     m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*(\d{1,2}):(\d{2})\s*\(KST\)", text)
     if m:
@@ -308,7 +315,9 @@ def parse_zzz_selenium(posts: List[Dict]) -> List[Dict]:
             if not dt_iso:
                 dt_iso, md = find_korean_datetime(title)
             if dt_iso:
+                # 실제 업데이트 시간을 사용 (사전다운로드가 아닌)
                 version_to_update_date[ver] = dt_iso.split("T")[0]
+                print(f"  Found update time for version {ver}: {dt_iso}")
 
     for p in posts:
         title = p["title"]
@@ -355,8 +364,11 @@ def parse_zzz_selenium(posts: List[Dict]) -> List[Dict]:
                 start = version_to_update_date.get(ver, "")
                 _, end = find_korean_daterange(body)
                 
-                # 날짜가 없으면 현재 날짜 사용
-                if not start:
+                # 업데이트 안내에서 가져온 실제 업데이트 날짜 사용
+                if start:
+                    print(f"  -> 실제 업데이트일 사용: {start}")
+                else:
+                    # 날짜가 없으면 현재 날짜 사용
                     from datetime import datetime
                     start = datetime.now().strftime("%Y-%m-%d")
                     print(f"  -> 시작일 없음, 현재 날짜 사용: {start}")

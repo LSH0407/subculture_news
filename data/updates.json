@@ -19127,5 +19127,29 @@
     "end_date": "2025-10-29",
     "description": "시작일 : 10월 16일\n종료일 : 10월 29일\n[신규] 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/6787530"
+  },
+  {
+    "game_id": "zzz",
+    "version": "2.3",
+    "update_date": "2025-10-14",
+    "end_date": "2026-01-12",
+    "description": "시작일 : 10-14\n종료일 : 2026-01-12\n[이벤트] 기간 한정 채널(상반기)",
+    "url": "https://www.hoyolab.com/article/41722228"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2025-10-16",
+    "end_date": "2025-10-29",
+    "description": "시작일 : 10월 16일\n종료일 : 10월 29일\n[신규] 점검&업데이트 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/6787530"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2025-10-16",
+    "end_date": "2025-10-29",
+    "description": "시작일 : 10월 16일\n종료일 : 10월 29일\n[신규] 델타 : 닌자 시프 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/6787530"
   }
 ]

@@ -267,22 +267,48 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
             body = p["body"]
             print(f"  Body length: {len(body)}")
             
-            # SSR ... ] 패턴 또는 캐릭터명 추출
+            # 캐릭터명 추출 (제목과 본문에서)
+            recruit = "특수모집"
             try:
-                m = re.search(r"(SSR[^\]]+\])", body)
-                if not m:
-                    # 다른 패턴으로 캐릭터명 찾기
-                    m = re.search(r"「([^」]+)」", body)  # 「캐릭터명」 패턴
-                if not m:
-                    m = re.search(r"\[([^\]]+)\].*?특수모집", body)  # [캐릭터명] 특수모집 패턴
-                if not m:
-                    m = re.search(r"\[([^\]]+)\].*?특수 모집", body)  # [캐릭터명] 특수 모집 패턴
+                # 1. 제목에서 캐릭터명 찾기 (우선순위 높음)
+                title = p.get("title", "")
                 
-                recruit = m.group(1) if m else "특수모집"
-                try:
-                    print(f"  Recruit character: {recruit}")
-                except:
-                    print(f"  Recruit character: [encoding error]")
+                # 제목에서는 특수모집 관련 키워드만 확인 (실제 캐릭터명은 본문에서)
+                # 델타: 닌자 시프 같은 패턴
+                m = re.search(r"([가-힣\w\s]+:\s*[가-힣\w\s]+)", title)
+                if not m:
+                    # Delta: Ninja Thief 같은 영문 패턴
+                    m = re.search(r"([A-Za-z]+:\s*[A-Za-z\s]+)", title)
+                # 제목의 [점검&업데이트] 같은 태그는 무시하고 본문에서 찾기
+                
+                if m:
+                    recruit = m.group(1).strip()
+                    print(f"  Character from title: {recruit}")
+                else:
+                    # 2. 본문에서 캐릭터명 찾기
+                    # "SSR 니케 [델타 : 닌자 시프]" 패턴
+                    m = re.search(r"SSR\s*니케\s*\[([^\]]+)\]", body)
+                    if not m:
+                        # "SSR [캐릭터명]" 패턴
+                        m = re.search(r"SSR[^[]*\[([^\]]+)\]", body)
+                    if not m:
+                        # 일반적인 [캐릭터명] 패턴 (특수모집 근처)
+                        m = re.search(r"\[([^\]]+)\].*?특수\s*모집", body)
+                    if not m:
+                        # 「캐릭터명」 패턴
+                        m = re.search(r"「([^」]+)」", body)
+                    
+                    if m:
+                        recruit = m.group(1).strip()
+                        print(f"  Character from body: {recruit}")
+                    else:
+                        print(f"  No character pattern found, using default")
+                
+                # 캐릭터명이 너무 길면 자르기 (전체 본문이 들어가는 것 방지)
+                if len(recruit) > 50:
+                    recruit = "특수모집"
+                    print(f"  Character name too long, using default")
+                
             except Exception as e:
                 recruit = "특수모집"
                 print(f"  Character extraction failed: {e}")
@@ -330,17 +356,18 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
                     end_month = int(e[5:7])
                     end_day = int(e[8:10])
                     
-                    # 캐릭터명이 너무 길면 자르기 (전체 본문이 들어가는 것 방지)
-                    if len(recruit) > 100:
-                        recruit = "특수모집"
-                        print(f"  Recruit name too long, using default")
+                    # 설명문 생성 (캐릭터명 포함)
+                    if recruit == "특수모집":
+                        description = f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[신규] 특수모집"
+                    else:
+                        description = f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[신규] {recruit} 특수모집"
                     
                     result = {
                         "game_id": "nikke",
                         "version": "",
                         "update_date": s,
                         "end_date": e,
-                        "description": f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[신규] {recruit}",
+                        "description": description,
                         "url": p["url"],
                     }
                     out.append(result)
