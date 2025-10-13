@@ -7,6 +7,7 @@ HoYoLAB Selenium 기반 스크래퍼
 import json
 import os
 import re
+import time
 from datetime import datetime, timezone
 from typing import Dict, List, Tuple
 
@@ -125,26 +126,96 @@ def fetch_posts_selenium(author_id: str, limit: int = 20) -> List[Dict]:
                 continue
         
         # 각 포스트의 본문 가져오기
-        for post in posts:
+        for i, post in enumerate(posts):
             try:
+                print(f"  -> 포스트 {i+1}/{len(posts)} 처리 중: {post['url']}")
                 driver.get(post["url"])
                 wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
                 
-                # 제목이 비어있으면 페이지에서 다시 찾기
+                # 페이지 로딩을 위한 추가 대기
+                time.sleep(2)
+                
+                # 제목이 비어있으면 페이지에서 다시 찾기 (여러 방법 시도)
                 if not post["title"] or len(post["title"]) < 10:
                     try:
+                        # 방법 1: h1 태그에서 찾기
+                        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
                         title_element = driver.find_element(By.TAG_NAME, "h1")
                         new_title = title_element.text.strip()
                         if new_title:
                             post["title"] = new_title
-                            print(f"  -> 제목 업데이트: {new_title}")
+                            print(f"  -> 제목 업데이트 (h1): {new_title}")
                     except:
-                        pass
+                        try:
+                            # 방법 2: 특정 클래스나 선택자로 찾기
+                            title_selectors = [
+                                "[data-testid='article-title']",
+                                ".article-title",
+                                ".post-title", 
+                                "h1[class*='title']",
+                                "h2[class*='title']"
+                            ]
+                            for selector in title_selectors:
+                                try:
+                                    title_elem = driver.find_element(By.CSS_SELECTOR, selector)
+                                    new_title = title_elem.text.strip()
+                                    if new_title:
+                                        post["title"] = new_title
+                                        print(f"  -> 제목 업데이트 ({selector}): {new_title}")
+                                        break
+                                except:
+                                    continue
+                        except:
+                            pass
                 
-                # 본문 텍스트 추출
-                body_element = driver.find_element(By.TAG_NAME, "body")
-                body_text = body_element.text
-                post["body"] = body_text
+                # 특별 방송 예고 포스트 강제 처리 (41722228)
+                if "41722228" in post["url"]:
+                    print(f"  -> 특별 방송 예고 포스트 감지, 강제 처리")
+                    try:
+                        # 더 긴 대기 시간과 다양한 선택자 시도
+                        WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
+                        time.sleep(3)  # 추가 대기
+                        
+                        # JavaScript로 제목 추출 시도
+                        title_js = driver.execute_script("""
+                            var title = document.querySelector('h1');
+                            if (title) return title.innerText || title.textContent;
+                            
+                            var titleSelectors = ['[data-testid="article-title"]', '.article-title', '.post-title'];
+                            for (var i = 0; i < titleSelectors.length; i++) {
+                                var elem = document.querySelector(titleSelectors[i]);
+                                if (elem && elem.innerText) return elem.innerText;
+                            }
+                            return '';
+                        """)
+                        
+                        if title_js and title_js.strip():
+                            post["title"] = title_js.strip()
+                            print(f"  -> 특별 방송 예고 제목 강제 업데이트 (JS): {title_js.strip()}")
+                        else:
+                            # 페이지 소스에서 직접 추출 시도
+                            page_source = driver.page_source
+                            title_match = re.search(r'<h1[^>]*>([^<]+)</h1>', page_source)
+                            if title_match:
+                                post["title"] = title_match.group(1).strip()
+                                print(f"  -> 특별 방송 예고 제목 강제 업데이트 (regex): {title_match.group(1).strip()}")
+                    except Exception as e:
+                        print(f"  -> 특별 방송 예고 제목 업데이트 실패: {e}")
+                
+                # 본문 로딩 보강: 스크롤 후 innerText 재수집
+                try:
+                    # 페이지 하단까지 스크롤하여 동적 콘텐츠 로딩 유도
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    time.sleep(1)  # 로딩 대기
+                    
+                    # innerText로 더 정확한 텍스트 추출
+                    body_text = driver.execute_script("return document.body.innerText;")
+                    post["body"] = body_text
+                except:
+                    # fallback: 기존 방식
+                    body_element = driver.find_element(By.TAG_NAME, "body")
+                    body_text = body_element.text
+                    post["body"] = body_text
                 
             except Exception as e:
                 print(f"포스트 본문 가져오기 실패 {post['url']}: {e}")

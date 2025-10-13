@@ -163,11 +163,18 @@ def fetch_board_posts(board_url: str, max_items: int = 20) -> List[Dict]:
     
     print(f"Collected {len(posts)} posts")
     
-    # 본문 수집 (Selenium 사용)
-    for p in posts:
+    # 본문 수집 (Selenium 사용, 개선된 로직)
+    for i, p in enumerate(posts):
         try:
-            ps = get_with_selenium(p["url"], wait_time=5)
-            p["body"] = ps.get_text("\n", strip=True)
+            print(f"  -> Getting body for post {i+1}/{len(posts)}: {p['url']}")
+            ps = get_with_selenium(p["url"], wait_time=10)  # 대기 시간 증가
+            body_text = ps.get_text("\n", strip=True)
+            p["body"] = body_text
+            
+            # 특수모집 관련 키워드가 있는지 확인
+            if any(keyword in body_text for keyword in ['특수모집', '합류', '모집에 합류']):
+                print(f"    *** Found recruit keywords in body! ***")
+                
         except Exception as e:
             print(f"Failed to get body for {p['url']}: {e}")
             p["body"] = ""
@@ -186,36 +193,126 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
     except Exception:
         pass  # 인코딩 오류 무시
     
-    for p in update_posts:
-        if "업데이트 소식 사전 안내" in p["title"] and "모집에 합류" in p.get("body", ""):
-            body = p["body"]
-            # SSR ... ] 패턴
-            m = re.search(r"(SSR[^\]]+\])", body)
-            recruit = m.group(1) if m else "모집"
-            # 모집기간 라인에서 날짜 범위 추출
-            s, e = kor_range(body)
-            if not (s and e):
-                # 단일 날짜들만 있는 경우 첫/둘째 날짜 시도
-                dates = re.findall(r"(\d{1,2})월\s*(\d{1,2})일", body)
-                if len(dates) >= 2:
-                    y = datetime.now().year
-                    s = f"{y}-{int(dates[0][0]):02d}-{int(dates[0][1]):02d}"
-                    e = f"{y}-{int(dates[1][0]):02d}-{int(dates[1][1]):02d}"
-            if s and e:
-                # 한글 날짜 표시
-                start_month = int(s[5:7])
-                start_day = int(s[8:10])
-                end_month = int(e[5:7])
-                end_day = int(e[8:10])
+    for i, p in enumerate(update_posts):
+        try:
+            print(f"Parsing post {i+1}/{len(update_posts)}: {p['title'][:50]}...")
+        except:
+            print(f"Parsing post {i+1}/{len(update_posts)}: [encoding error in title]")
+            
+        # 특수모집 합류 감지 로직 개선
+        title_lower = p["title"].lower()
+        body_lower = p.get("body", "").lower()
+        
+        # 다양한 패턴으로 특수모집 합류 감지 (더 유연한 조건)
+        body = p.get("body", "")
+        title = p["title"]
+        
+        is_recruit_post = (
+            # 조건 1: 업데이트 소식 사전 안내 + 모집 관련 키워드
+            ("업데이트 소식 사전 안내" in title and ("모집에 합류" in body or "특수 모집" in body or ("모집" in body and "합류" in body))) or
+            # 조건 2: 제목에 특수모집 + 합류
+            ("특수모집" in title and "합류" in title) or
+            # 조건 3: 본문에 특수모집 + 합류 (띄어쓰기 고려)
+            (("특수모집" in body or "특수 모집" in body) and "합류" in body) or
+            # 조건 4: 캐릭터 특수모집
+            ("캐릭터 특수모집" in title) or
+            ("캐릭터 특수모집" in body) or
+            # 조건 5: SSR + 합류 (니케 특화)
+            ("SSR" in body and "합류" in body and "업데이트 소식 사전 안내" in title)
+        )
+        
+        # 각 조건 확인
+        cond1 = "업데이트 소식 사전 안내" in title and ("모집에 합류" in body or "특수 모집" in body or ("모집" in body and "합류" in body))
+        cond2 = "특수모집" in title and "합류" in title
+        cond3 = ("특수모집" in body or "특수 모집" in body) and "합류" in body
+        cond4 = "캐릭터 특수모집" in title
+        cond5 = "캐릭터 특수모집" in body
+        cond6 = "SSR" in body and "합류" in body and "업데이트 소식 사전 안내" in title
+        
+        if any([cond1, cond2, cond3, cond4, cond5, cond6]):
+            print(f"  Recruit conditions: cond1={cond1}, cond2={cond2}, cond3={cond3}, cond4={cond4}, cond5={cond5}, cond6={cond6}")
+            print(f"  URL: {p['url']}")
+            print(f"  Body length: {len(p.get('body', ''))}")
+            if "특수모집" in p.get("body", ""):
+                print(f"  Body contains '특수모집'")
+            if "특수 모집" in p.get("body", ""):
+                print(f"  Body contains '특수 모집'")
+            if "합류" in p.get("body", ""):
+                print(f"  Body contains '합류'")
+            if "SSR" in p.get("body", ""):
+                print(f"  Body contains 'SSR'")
+        
+        if is_recruit_post:
+            try:
+                print(f"Found recruit post: {p['title']}")
+            except:
+                print("Found recruit post: [encoding error in title]")
                 
-                out.append({
-                    "game_id": "nikke",
-                    "version": "",
-                    "update_date": s,
-                    "end_date": e,
-                    "description": f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[신규] {recruit}",
-                    "url": p["url"],
-                })
+            body = p["body"]
+            print(f"  Body length: {len(body)}")
+            
+            # SSR ... ] 패턴 또는 캐릭터명 추출
+            try:
+                m = re.search(r"(SSR[^\]]+\])", body)
+                if not m:
+                    # 다른 패턴으로 캐릭터명 찾기
+                    m = re.search(r"「([^」]+)」", body)  # 「캐릭터명」 패턴
+                if not m:
+                    m = re.search(r"\[([^\]]+)\].*?특수모집", body)  # [캐릭터명] 특수모집 패턴
+                if not m:
+                    m = re.search(r"\[([^\]]+)\].*?특수 모집", body)  # [캐릭터명] 특수 모집 패턴
+                
+                recruit = m.group(1) if m else "특수모집"
+                try:
+                    print(f"  Recruit character: {recruit}")
+                except:
+                    print(f"  Recruit character: [encoding error]")
+            except Exception as e:
+                recruit = "특수모집"
+                print(f"  Character extraction failed: {e}")
+            
+            # 모집기간 라인에서 날짜 범위 추출
+            try:
+                s, e = kor_range(body)
+                print(f"  Date range from kor_range: {s} ~ {e}")
+                
+                if not (s and e):
+                    # 단일 날짜들만 있는 경우 첫/둘째 날짜 시도
+                    dates = re.findall(r"(\d{1,2})월\s*(\d{1,2})일", body)
+                    print(f"  Found {len(dates)} date patterns: {dates}")
+                    if len(dates) >= 2:
+                        y = datetime.now().year
+                        s = f"{y}-{int(dates[0][0]):02d}-{int(dates[0][1]):02d}"
+                        e = f"{y}-{int(dates[1][0]):02d}-{int(dates[1][1]):02d}"
+                        print(f"  Constructed date range: {s} ~ {e}")
+                
+                if s and e:
+                    # 한글 날짜 표시
+                    start_month = int(s[5:7])
+                    start_day = int(s[8:10])
+                    end_month = int(e[5:7])
+                    end_day = int(e[8:10])
+                    
+                    result = {
+                        "game_id": "nikke",
+                        "version": "",
+                        "update_date": s,
+                        "end_date": e,
+                        "description": f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[신규] {recruit}",
+                        "url": p["url"],
+                    }
+                    out.append(result)
+                    try:
+                        print(f"  *** Added recruit update: {result}")
+                    except:
+                        print(f"  *** Added recruit update: [encoding error in output]")
+                else:
+                    try:
+                        print(f"  No date range found for recruit post: {p['title']}")
+                    except:
+                        print("  No date range found for recruit post: [encoding error in title]")
+            except Exception as e:
+                print(f"  Date extraction failed: {e}")
     
     # 특별 방송 안내 (패턴 완화)
     broadcast_posts = fetch_board_posts(board_broadcast_url, limit)
