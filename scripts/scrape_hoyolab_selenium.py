@@ -451,15 +451,25 @@ def parse_star_rail_selenium(posts: List[Dict]) -> List[Dict]:
         if "프리뷰 스페셜 프로그램" in title and ver and "-" not in title and "|" not in title:
             print(f"  -> 프리뷰 스페셜 프로그램 발견!")
             dt_iso, _ = find_korean_datetime(body)
-            if dt_iso:
-                results.append({
-                    "game_id": "star_rail",
-                    "version": ver,
-                    "update_date": dt_iso,
-                    "description": f"{ver} 프리뷰 스페셜 프로그램",
-                    "url": url,
-                })
-                print(f"  -> 추가됨: {ver} 프리뷰 스페셜 프로그램 ({dt_iso})")
+            if not dt_iso:
+                dt_iso, _ = find_korean_datetime(title)
+            
+            # 날짜가 없어도 버전이 있으면 추가 (최신 게시물이므로)
+            if not dt_iso:
+                # 현재 날짜 사용
+                from datetime import datetime
+                now = datetime.now()
+                dt_iso = now.strftime("%Y-%m-%dT%H:%M:00+09:00")
+                print(f"  -> 날짜 없음, 현재 시간 사용: {dt_iso}")
+            
+            results.append({
+                "game_id": "star_rail",
+                "version": ver,
+                "update_date": dt_iso,
+                "description": f"{ver} 프리뷰 스페셜 프로그램",
+                "url": url,
+            })
+            print(f"  -> 추가됨: {ver} 프리뷰 스페셜 프로그램 ({dt_iso})")
             continue
             
         # 이벤트 워프 (1/2)

@@ -19151,5 +19151,12 @@
     "end_date": "2025-10-29",
     "description": "시작일 : 10월 16일\n종료일 : 10월 29일\n[신규] 델타 : 닌자 시프 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/6787530"
+  },
+  {
+    "game_id": "star_rail",
+    "version": "3.7",
+    "update_date": "2025-10-24T15:55:00+09:00",
+    "description": "3.7 프리뷰 스페셜 프로그램",
+    "url": "https://www.hoyolab.com/article/41851609"
   }
 ]
