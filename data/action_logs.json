@@ -790,5 +790,13 @@
     "changes": "0+0-",
     "commit": "360017bfa7be869083019ffa1645963174935249",
     "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-10-24T05:31:33Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "8b21c7b63b3b4ffa9d718bd7b8fee41c8514a1af",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
   }
 ]
