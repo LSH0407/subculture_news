@@ -61,9 +61,13 @@ def get(url: str) -> BeautifulSoup:
     r.raise_for_status()
     return BeautifulSoup(r.text, "html.parser")
 
-def get_with_selenium(url: str, wait_time: int = 10) -> BeautifulSoup:
+def get_with_selenium(url: str, wait_time: int = 10, driver=None) -> BeautifulSoup:
     """Selenium을 사용한 JavaScript 렌더링"""
-    driver = get_selenium_driver()
+    should_quit = False
+    if driver is None:
+        driver = get_selenium_driver()
+        should_quit = True
+    
     try:
         driver.get(url)
         # 페이지 로딩 대기
@@ -71,11 +75,12 @@ def get_with_selenium(url: str, wait_time: int = 10) -> BeautifulSoup:
             EC.presence_of_element_located((By.TAG_NAME, "body"))
         )
         # 추가 대기 (동적 콘텐츠 로딩)
-        time.sleep(3)
+        time.sleep(2)  # 3초에서 2초로 단축
         html = driver.page_source
         return BeautifulSoup(html, "html.parser")
     finally:
-        driver.quit()
+        if should_quit:
+            driver.quit()
 
 
 def kor_dt(text: str) -> Tuple[str, str]:
@@ -138,10 +143,34 @@ def kor_range(text: str) -> Tuple[str, str]:
 
 
 def fetch_board_posts(board_url: str, max_items: int = 20) -> List[Dict]:
-    """게시판 게시글 수집 (Selenium 사용)"""
+    """게시판 게시글 수집 (Selenium 사용, 최적화된 버전)"""
+    driver = None
     try:
-        # Selenium으로 JavaScript 렌더링된 페이지 가져오기
-        soup = get_with_selenium(board_url)
+        # 하나의 드라이버 인스턴스로 모든 작업 수행
+        driver = get_selenium_driver()
+        
+        # Selenium으로 JavaScript 렌더링된 페이지 가져오기 (SPA 대응)
+        print(f"Loading SPA page with Selenium: {board_url}")
+        driver.get(board_url)
+        
+        # SPA 로딩 대기 (더 긴 시간)
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.webdriver.common.by import By
+        
+        try:
+            wait = WebDriverWait(driver, 20)
+            # 게시글 제목이 로드될 때까지 대기
+            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "a[class*='title']")))
+            print("SPA content loaded successfully")
+        except Exception as e:
+            print(f"SPA loading timeout, proceeding anyway: {e}")
+        
+        # 추가 안전 대기
+        time.sleep(5)
+        
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
     except Exception as e:
         print(f"Selenium failed for {board_url}, falling back to requests: {e}")
         # Fallback to requests
@@ -149,9 +178,14 @@ def fetch_board_posts(board_url: str, max_items: int = 20) -> List[Dict]:
     
     posts: List[Dict] = []
     
-    # 네이버 게임 라운지 게시글 제목 선택자 사용
-    # post_board_title 클래스로 실제 게시글 제목 링크 찾기
-    title_links = soup.find_all("a", class_=lambda x: x and "post_board_title" in x)
+    # 네이버 게임 라운지 게시글 제목 선택자 사용 (SPA 대응)
+    # 다양한 선택자로 게시글 제목 링크 찾기
+    title_links = soup.select("a[class*='title']")
+    if not title_links:
+        # fallback 선택자들
+        title_links = soup.find_all("a", class_=lambda x: x and "post_board_title" in x)
+    if not title_links:
+        title_links = soup.select("a[href*='detail']")
     
     print(f"Found {len(title_links)} title links from {board_url}")
     
@@ -179,21 +213,40 @@ def fetch_board_posts(board_url: str, max_items: int = 20) -> List[Dict]:
     
     print(f"Collected {len(posts)} posts")
     
-    # 본문 수집 (Selenium 사용, 개선된 로직)
-    for i, p in enumerate(posts):
-        try:
-            print(f"  -> Getting body for post {i+1}/{len(posts)}: {p['url']}")
-            ps = get_with_selenium(p["url"], wait_time=10)  # 대기 시간 증가
-            body_text = ps.get_text("\n", strip=True)
-            p["body"] = body_text
-            
-            # 특수모집 관련 키워드가 있는지 확인
-            if any(keyword in body_text for keyword in ['특수모집', '합류', '모집에 합류']):
-                print(f"    *** Found recruit keywords in body! ***")
+    # 본문 수집 (같은 드라이버 인스턴스 재사용)
+    if driver:
+        for i, p in enumerate(posts):
+            try:
+                print(f"  -> Getting body for post {i+1}/{len(posts)}: {p['url']}")
+                ps = get_with_selenium(p["url"], wait_time=8, driver=driver)  # 대기 시간 단축
+                body_text = ps.get_text("\n", strip=True)
+                p["body"] = body_text
                 
-        except Exception as e:
-            print(f"Failed to get body for {p['url']}: {e}")
-            p["body"] = ""
+                # 특수모집 관련 키워드가 있는지 확인
+                if any(keyword in body_text for keyword in ['특수모집', '합류', '모집에 합류']):
+                    print(f"    *** Found recruit keywords in body! ***")
+                    
+            except Exception as e:
+                print(f"Failed to get body for {p['url']}: {e}")
+                p["body"] = ""
+    else:
+        # Selenium이 실패한 경우 requests로 본문 수집 시도
+        for i, p in enumerate(posts):
+            try:
+                print(f"  -> Getting body for post {i+1}/{len(posts)} (requests): {p['url']}")
+                ps = get(p["url"])
+                body_text = ps.get_text("\n", strip=True)
+                p["body"] = body_text
+            except Exception as e:
+                print(f"Failed to get body for {p['url']}: {e}")
+                p["body"] = ""
+    
+    # 드라이버 정리
+    if driver:
+        try:
+            driver.quit()
+        except:
+            pass
     
     return posts
 
