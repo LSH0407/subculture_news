@@ -798,5 +798,197 @@
     "changes": "0+0-",
     "commit": "8b21c7b63b3b4ffa9d718bd7b8fee41c8514a1af",
     "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-10-25T03:31:56Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1482+702-",
+    "commit": "de99a078502bc3745ff7bcc193028befbf35362c",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-10-25T04:22:25Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "a4e00a533e70c76c9bd687b258cb46bcca978866",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-10-25T05:29:35Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "9b9fefe590f2aa60e411f05700be81ffbd98bddd",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-10-26T03:38:21Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1366+694-",
+    "commit": "e1c7cacffcea473b3ddaa300e3bc04bf685e081f",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-10-26T04:20:53Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "92be972d38c34ef1532c09f7783326aba0ecbd5a",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-10-26T05:32:09Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "7+0-",
+    "commit": "82099aea9827239599d2f32a0112611602adb7a4",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-10-27T03:48:14Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1051+703-",
+    "commit": "370c518658e569b4a8152fc653365da642f9b544",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-10-27T04:28:53Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "61151c199c72771db993578ad788711067bad3c6",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-10-27T05:26:38Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "a2826f8b47b76d3353d165a6bfd8ecf480dd0319",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-10-28T03:38:20Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1347+651-",
+    "commit": "96e6300615805dc360b5e593b8b069ecdca0ddd9",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-10-28T04:23:16Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "996d049129694488b37d6b84531e876535cff9f7",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-10-28T05:33:50Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "15+0-",
+    "commit": "3ed5c7b71f19e6ef8406de23819222deef1bdee1",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-10-29T03:44:26Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1528+736-",
+    "commit": "48e9474b629e136d7eab85e6b69ed602609e6089",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-10-29T04:25:55Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "824456952f1368dc083d7e07a5405812a2083da9",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-10-29T05:32:46Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "213930a970d86dbef9615344b5ad00faf17c2f0d",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-10-30T03:40:28Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1496+824-",
+    "commit": "d9183975c42f0f8cc2c3f8db9c815e981e039125",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-10-30T04:23:14Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "527651c440d02b456de6667e1b5a09f7baf331ce",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-10-30T05:32:31Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "58cebe9b19c3ceebcc98048113b13c8f6b43539d",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-10-31T03:40:40Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1430+794-",
+    "commit": "9185cf52127d53c3bade353b4825f240fd298db5",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-10-31T04:23:08Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "3ab73732800ffe6d5489debbcf60754fe732a229",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-10-31T05:30:58Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "ff864041fc0ebd175d2af0e2d30a0669312fb8fe",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-11-01T03:40:18Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1893+501-",
+    "commit": "376f6a5932a45f2322956aed8603f009f181ca9d",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-11-01T04:19:43Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "b6c7bee76ff0916a1ef8ca1589f68444672e8517",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2025-11-01T05:32:02Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "2d97dde1fbefefe4ab1343e0254f5b88a82a2d22",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
   }
 ]
