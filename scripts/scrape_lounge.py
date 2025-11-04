@@ -116,7 +116,21 @@ def kor_dt(text: str) -> Tuple[str, str]:
 
 
 def kor_range(text: str) -> Tuple[str, str]:
-    # 패턴 1: X월 X일 ~ X월 X일
+    # 패턴 1: YYYY년 X월 X일 HH:MM ~ YYYY년 X월 X일 HH:MM (시간 포함)
+    m = re.search(r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*\d{1,2}:\d{2}\s*[~\-–—]\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*\d{1,2}:\d{2}", text)
+    if m:
+        s = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+        e = f"{m.group(4)}-{int(m.group(5)):02d}-{int(m.group(6)):02d}"
+        return s, e
+    
+    # 패턴 2: YYYY년 X월 X일 ~ YYYY년 X월 X일 (시간 없음)
+    m = re.search(r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[~\-–—]\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일", text)
+    if m:
+        s = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+        e = f"{m.group(4)}-{int(m.group(5)):02d}-{int(m.group(6)):02d}"
+        return s, e
+    
+    # 패턴 3: X월 X일 ~ X월 X일
     m = re.search(r"(\d{1,2})월\s*(\d{1,2})일\s*[~\-–—]\s*(\d{1,2})월\s*(\d{1,2})일", text)
     if m:
         y = datetime.now().year
@@ -124,20 +138,13 @@ def kor_range(text: str) -> Tuple[str, str]:
         e = f"{y}-{int(m.group(3)):02d}-{int(m.group(4)):02d}"
         return s, e
     
-    # 패턴 2: 업데이트 이후 ~ YYYY년 X월 X일 (명조 특화)
+    # 패턴 4: 업데이트 이후 ~ YYYY년 X월 X일 (명조 특화)
     m = re.search(r"업데이트\s*이후.*?(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일", text)
     if m:
         # 종료일은 추출 가능
         e = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
         # 시작일은 버전 업데이트 공지에서 찾아야 함 (parse_ww에서 처리)
         return "", e
-    
-    # 패턴 3: YYYY년 X월 X일 ~ YYYY년 X월 X일
-    m = re.search(r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[~\-–—]\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일", text)
-    if m:
-        s = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
-        e = f"{m.group(4)}-{int(m.group(5)):02d}-{int(m.group(6)):02d}"
-        return s, e
     
     return "", ""
 
@@ -485,8 +492,8 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
     for p in posts_tuning:
         # "캐릭터 이벤트 튜닝"만 필터링 (무기 이벤트 튜닝 제외)
         if "캐릭터" in p["title"] and "이벤트" in p["title"] and "튜닝" in p["title"]:
-            # "무기" 키워드가 있으면 제외
-            if "무기" in p["title"]:
+            # 제목에 "무기" 키워드가 있으면 제외 (본문의 "무기"는 무시)
+            if "무기" in p["title"] and "캐릭터" not in p["title"]:
                 continue
             try:
                 print(f"Found tuning post: {p['title']}")
