@@ -1182,5 +1182,13 @@
     "changes": "0+0-",
     "commit": "e53194dbdadd5ff25f3b3259855958ff5a44300a",
     "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2025-11-10T03:47:20Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "1438+766-",
+    "commit": "d0963d636b1757cdda0188f46ee2c20ec794741f",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
   }
 ]
