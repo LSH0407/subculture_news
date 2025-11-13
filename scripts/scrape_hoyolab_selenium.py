@@ -65,12 +65,20 @@ def fetch_posts_selenium(author_id: str, limit: int = 20) -> List[Dict]:
         print(f"Fetching from: {url}")
         driver.get(url)
         
-        # 페이지 로딩 대기
-        wait = WebDriverWait(driver, 10)
+        # 페이지 로딩 대기 (더 긴 시간)
+        wait = WebDriverWait(driver, 20)
         
         # 포스트 링크들이 로드될 때까지 대기
         try:
             wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "a[href*='/article/']")))
+            # 추가 대기: 동적 콘텐츠 로딩
+            time.sleep(3)
+            
+            # 페이지를 스크롤하여 더 많은 콘텐츠 로딩
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(2)
+            driver.execute_script("window.scrollTo(0, 0);")
+            time.sleep(1)
         except TimeoutException:
             print("포스트 링크를 찾을 수 없습니다. 페이지 구조를 확인합니다...")
             # 페이지 소스 확인
@@ -151,14 +159,16 @@ def fetch_posts_selenium(author_id: str, limit: int = 20) -> List[Dict]:
                 driver.get(post["url"])
                 wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
                 
-                # 페이지 로딩을 위한 추가 대기
-                time.sleep(2)
+                # 페이지 로딩 대기 (동적 콘텐츠)
+                time.sleep(3)
                 
-                # 제목이 비어있으면 페이지에서 다시 찾기 (여러 방법 시도)
+                # 제목이 비어있거나 짧으면 페이지에서 다시 찾기
                 if not post["title"] or len(post["title"]) < 10:
                     try:
-                        # 방법 1: h1 태그에서 찾기
-                        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
+                        # h1 태그가 로드될 때까지 더 긴 시간 대기
+                        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
+                        time.sleep(2)  # 추가 대기
+                        
                         title_element = driver.find_element(By.TAG_NAME, "h1")
                         new_title = title_element.text.strip()
                         if new_title:
@@ -327,32 +337,45 @@ def parse_zzz_selenium(posts: List[Dict]) -> List[Dict]:
         
         print(f"Processing ZZZ: {title}")
         
-        # 특별 방송 예고 (패턴 확장)
-        if ("특별 방송 예고" in title) or ("특별 방송" in title and "예고" in title):
-            print(f"  -> 특별 방송 예고 발견!")
+        # 특별 방송: 더 유연한 감지 로직
+        # 1. "특별 방송" 키워드 체크 (띄어쓰기 무시)
+        # 2. "방송 예고" 키워드 체크
+        # 3. "버전" + "방송" 조합
+        is_broadcast = (
+            ("특별" in title and "방송" in title) or
+            ("특별" in body and "방송" in body) or
+            ("방송" in title and "예고" in title) or
+            ("방송" in body and "예고" in body) or
+            (ver and "방송" in title) or
+            (ver and "방송" in body)
+        )
+        
+        if is_broadcast:
+            print(f"  -> 특별 방송 후보 발견: {title[:50] if title else '(제목 없음)'}...")
+            # 본문에서 시간 포함 형태 우선, 없으면 제목에서 재시도
             dt_iso, md = find_korean_datetime(body)
             if not dt_iso:
                 dt_iso, md = find_korean_datetime(title)
             
-            # 날짜가 없어도 버전이 있으면 추가 (최신 게시물이므로)
-            if ver:
-                if not dt_iso:
-                    # 현재 날짜 사용
-                    from datetime import datetime
-                    now = datetime.now()
-                    dt_iso = now.strftime("%Y-%m-%dT%H:%M:00+09:00")
-                    print(f"  -> 날짜 없음, 현재 시간 사용: {dt_iso}")
+            if dt_iso:
+                # 설명 구성 (버전 정보 포함)
+                if ver:
+                    desc = f"{ver} 버전 특별 방송"
+                elif "예고" in title or "예고" in body:
+                    desc = "특별 방송 예고"
+                else:
+                    desc = "특별 방송"
                 
                 results.append({
                     "game_id": "zzz",
-                    "version": ver,
+                    "version": ver or "",
                     "update_date": dt_iso,
-                    "description": f"{ver} 버전 특별 방송",
+                    "description": desc,
                     "url": url,
                 })
-                print(f"  -> 추가됨: {ver} 버전 특별 방송 ({dt_iso})")
+                print(f"  -> 특별 방송 파싱 성공: {desc} on {dt_iso}")
             else:
-                print(f"  -> 버전 정보 없음")
+                print(f"  -> 특별 방송 날짜 파싱 실패 (title: '{title[:50] if title else '(없음)'}', body length: {len(body)})")
             continue
             
         # 기간 한정 채널(상/하/상반기/하반기)

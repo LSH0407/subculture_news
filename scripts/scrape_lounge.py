@@ -582,28 +582,57 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
         pass  # 인코딩 오류 무시
     
     for p in broadcast_posts:
+        # 제목과 본문 모두에서 키워드 검색 (패턴 완화)
+        title = p["title"]
+        body = p.get("body", "")
+        
+        # 이모지 제거 (유니코드 이모지 범위)
+        title_clean = re.sub(r'[\U0001F300-\U0001F9FF\u2600-\u26FF\u2700-\u27BF]', '', title)
+        
         # "프리뷰" + "방송" 또는 "특별" + "방송" 키워드로 완화
-        if ("프리뷰" in p["title"] and "방송" in p["title"]) or \
-           ("특별" in p["title"] and "방송" in p["title"]):
+        # 제목 또는 본문에 키워드가 있으면 감지
+        is_broadcast = (
+            ("프리뷰" in title_clean and "방송" in title_clean) or
+            ("특별" in title_clean and "방송" in title_clean) or
+            ("프리뷰" in body and "방송" in body) or
+            ("특별" in body and "방송" in body)
+        )
+        
+        if is_broadcast:
             # "시작됩니다"가 포함된 제목은 과거 공지이므로 스킵
-            if "시작됩니다" in p["title"]:
+            if "시작됩니다" in title_clean:
                 continue
             try:
-                print(f"Found broadcast post: {p['title']}")
+                print(f"Found broadcast post: {title}")
             except Exception:
                 pass
-            dt_iso, _ = kor_dt(p.get("body", ""))
+            
+            # 본문에서 날짜 추출 (제목에서도 시도)
+            dt_iso, _ = kor_dt(body)
+            if not dt_iso:
+                dt_iso, _ = kor_dt(title_clean)
+            
             if dt_iso:
+                # 버전 추출 시도 (제목과 본문 모두에서)
+                ver_match = re.search(r"(\d+\.\d+)\s*버전", title_clean + " " + body)
+                ver = ver_match.group(1) if ver_match else ""
+                
+                desc = f"{ver}버전 프리뷰 특별 방송" if ver else "프리뷰 특별 방송"
+                
                 out.append({
                     "game_id": "ww",
-                    "version": "",
+                    "version": ver,
                     "update_date": dt_iso,
-                    "description": "프리뷰 특별 방송",
+                    "description": desc,
                     "url": p["url"],
                 })
+                try:
+                    print(f"  *** Added broadcast: {desc} on {dt_iso}")
+                except Exception:
+                    pass
             else:
                 try:
-                    print(f"  No date found in body (length: {len(p.get('body', ''))})")
+                    print(f"  No date found in title or body (body length: {len(body)})")
                 except Exception:
                     pass
     return out
