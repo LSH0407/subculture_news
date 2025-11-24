@@ -1526,5 +1526,13 @@
     "changes": "1310+638-",
     "commit": "e8c2839c079bd2a0e1ab6af5854dc9da81c93806",
     "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2025-11-24T04:33:10Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "74526d5b56399d543bba34a18063aa0fa4172999",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
   }
 ]
