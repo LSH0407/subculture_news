@@ -221,6 +221,13 @@ def find_korean_datetime(text: str) -> Tuple[str, str]:
 
 def find_korean_daterange(text: str) -> Tuple[str, str]:
     """Parse a range like '9월 24일 ~ 10월 15일' or '2025/11/26 12:00 ~ 2025/12/16 15:00' -> (YYYY-MM-DD, YYYY-MM-DD)."""
+    # 패턴 -1: "업데이트 후 ~ YYYY/MM/DD HH:MM" (종료일만 명시, 시작일은 없음)
+    m = re.search(r"업데이트\s*(?:후|이후).*?[~\-\–—]\s*(\d{4})/(\d{1,2})/(\d{1,2})\s+\d{1,2}:\d{2}", text)
+    if m:
+        y, mm, dd = map(int, m.groups())
+        # 시작일은 반환하지 않고 종료일만 반환 (빈 문자열, 종료일)
+        return "", datetime(y, mm, dd).strftime("%Y-%m-%d")
+    
     # 패턴 00: "YYYY/MM/DD HH:MM ~ YYYY/MM/DD HH:MM" (슬래시 형식, 시간 포함)
     m = re.search(r"(\d{4})/(\d{1,2})/(\d{1,2})\s+\d{1,2}:\d{2}\s*[~\-\–—]\s*(\d{4})/(\d{1,2})/(\d{1,2})\s+\d{1,2}:\d{2}", text)
     if m:
@@ -327,8 +334,9 @@ def parse_zzz(posts: List[Dict]) -> List[Dict]:
                 print(f"  -> 특별 방송 날짜 파싱 실패 (title: '{title[:50] if title else '(없음)'}', body length: {len(body)})")
             continue
         # 기간 한정 채널 (다양한 패턴 지원)
-        if "기간 한정 채널" in title or "채널" in title and ver:
+        if "기간 한정 채널" in title or ("채널" in title and ver):
             print(f"  -> 기간 한정 채널 후보 발견: {title[:50]}")
+            print(f"     본문 샘플: {body[:200]}")
             
             # 캐릭터명 추출 (「캐릭터명」 패턴)
             char_names = re.findall(r"「([^」]+)」", title)
@@ -336,18 +344,42 @@ def parse_zzz(posts: List[Dict]) -> List[Dict]:
             
             # 상/하 구분
             phase = ""
+            start, end = "", ""
+            
             if "상)" in title or "(상" in title or "상반기" in title:
                 phase = "(상)"
-                start = version_to_update_date.get(ver, "")
-                _, end = find_korean_daterange(body)
+                print(f"     -> 상반기 채널 감지")
+                # 본문에서 날짜 범위 추출 시도
+                start_parsed, end_parsed = find_korean_daterange(body)
+                # "업데이트 후 ~ 종료일" 형태면 start_parsed가 비어있음
+                if not start_parsed and end_parsed:
+                    # 캐시된 업데이트 날짜 사용
+                    start = version_to_update_date.get(ver, "")
+                    end = end_parsed
+                    print(f"     -> 시작일: 캐시({start}), 종료일: 본문({end})")
+                elif start_parsed and end_parsed:
+                    # 본문에 명확한 시작일과 종료일이 있는 경우
+                    start, end = start_parsed, end_parsed
+                    print(f"     -> 시작일/종료일 모두 본문에서 추출: {start} ~ {end}")
+                else:
+                    # 종료일만 추출 (본문에서)
+                    start = version_to_update_date.get(ver, "")
+                    _, end = find_korean_daterange(body)
+                    print(f"     -> 시작일: 캐시({start}), 종료일: 본문({end})")
+                    
             elif "하)" in title or "(하" in title or "하반기" in title:
                 phase = "(하)"
+                print(f"     -> 하반기 채널 감지")
                 start, end = find_korean_daterange(body)
+                print(f"     -> 본문에서 추출: {start} ~ {end}")
             else:
                 # 상/하 구분 없는 경우
+                print(f"     -> 일반 채널 (상/하 구분 없음)")
                 start, end = find_korean_daterange(body)
                 if not start:
                     start = version_to_update_date.get(ver, "")
+                    print(f"     -> 시작일 캐시 사용: {start}")
+                print(f"     -> 날짜: {start} ~ {end}")
             
             if start and end:
                 md_s = start.replace("2025-", "").replace("2024-", "").replace("2026-", "")
@@ -361,9 +393,9 @@ def parse_zzz(posts: List[Dict]) -> List[Dict]:
                     "description": desc,
                     "url": url,
                 })
-                print(f"    -> 채널 파싱 성공: {start} ~ {end}, {char_desc}{phase}")
+                print(f"    ✅ 채널 파싱 성공: {start} ~ {end}, {char_desc}{phase}")
             else:
-                print(f"    -> 날짜 파싱 실패 (start={start}, end={end})")
+                print(f"    ❌ 날짜 파싱 실패 (start={start}, end={end})")
     return results
 
 
