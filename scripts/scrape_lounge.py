@@ -327,121 +327,78 @@ def parse_nikke(board_update_url: str, board_broadcast_url: str, limit: int = 20
             body = p["body"]
             print(f"  Body length: {len(body)}")
             
-            # 캐릭터명 추출 (제목과 본문에서)
-            recruit = "특수모집"
+            # 여러 특수모집을 찾기 위해 본문을 분할
+            # "기간 한정 모집" 또는 "특수 모집"으로 구분된 섹션들을 처리
             try:
-                # 1. 제목에서 캐릭터명 찾기 (우선순위 높음)
-                title = p.get("title", "")
+                # 모든 SSR 니케 캐릭터 찾기
+                ssr_characters = re.findall(r"SSR\s*니케\s*\[([^\]]+)\]", body)
+                print(f"  Found {len(ssr_characters)} SSR NIKKE characters: {ssr_characters}")
                 
-                # 제목에서는 특수모집 관련 키워드만 확인 (실제 캐릭터명은 본문에서)
-                # 델타: 닌자 시프 같은 패턴
-                m = re.search(r"([가-힣\w\s]+:\s*[가-힣\w\s]+)", title)
-                if not m:
-                    # Delta: Ninja Thief 같은 영문 패턴
-                    m = re.search(r"([A-Za-z]+:\s*[A-Za-z\s]+)", title)
-                # 제목의 [점검&업데이트] 같은 태그는 무시하고 본문에서 찾기
+                if not ssr_characters:
+                    # fallback: SSR [...] 패턴
+                    ssr_characters = re.findall(r"SSR[^[]*\[([^\]]+)\]", body)
+                    print(f"  Fallback pattern found {len(ssr_characters)} characters: {ssr_characters}")
                 
-                if m:
-                    recruit = m.group(1).strip()
-                    print(f"  Character from title: {recruit}")
-                else:
-                    # 2. 본문에서 캐릭터명 찾기
-                    # "SSR 니케 [델타 : 닌자 시프]" 패턴
-                    m = re.search(r"SSR\s*니케\s*\[([^\]]+)\]", body)
-                    if not m:
-                        # "SSR [캐릭터명]" 패턴
-                        m = re.search(r"SSR[^[]*\[([^\]]+)\]", body)
-                    if not m:
-                        # 일반적인 [캐릭터명] 패턴 (특수모집 근처)
-                        m = re.search(r"\[([^\]]+)\].*?특수\s*모집", body)
-                    if not m:
-                        # 「캐릭터명」 패턴
-                        m = re.search(r"「([^」]+)」", body)
+                # 각 캐릭터에 대해 개별적으로 날짜 정보 찾기
+                for char_name in ssr_characters:
+                    print(f"\n  Processing character: {char_name}")
                     
-                    if m:
-                        recruit = m.group(1).strip()
-                        print(f"  Character from body: {recruit}")
+                    # 해당 캐릭터 섹션 추출
+                    # 캐릭터명이 나온 이후 ~ 다음 SSR 니케가 나오기 전까지
+                    char_pattern = rf"\[{re.escape(char_name)}\]"
+                    char_idx = body.find(f"[{char_name}]")
+                    
+                    if char_idx == -1:
+                        print(f"    Character name not found in body, skipping")
+                        continue
+                    
+                    # 다음 SSR 니케가 나올 때까지의 섹션 (없으면 끝까지)
+                    next_ssr_idx = body.find("SSR 니케", char_idx + len(char_name) + 50)
+                    if next_ssr_idx == -1:
+                        char_section = body[char_idx:]
                     else:
-                        print(f"  No character pattern found, using default")
-                
-                # 캐릭터명이 너무 길면 자르기 (전체 본문이 들어가는 것 방지)
-                if len(recruit) > 50:
-                    recruit = "특수모집"
-                    print(f"  Character name too long, using default")
-                
-            except Exception as e:
-                recruit = "특수모집"
-                print(f"  Character extraction failed: {e}")
-            
-            # 모집기간 라인에서 날짜 범위 추출
-            try:
-                s, e = kor_range(body)
-                print(f"  Date range from kor_range: {s} ~ {e}")
-                
-                if not (s and e):
-                    # 단일 날짜들만 있는 경우 첫/둘째 날짜 시도
-                    dates = re.findall(r"(\d{1,2})월\s*(\d{1,2})일", body)
-                    print(f"  Found {len(dates)} date patterns: {dates}")
-                    if len(dates) >= 2:
-                        # 특수모집 관련 날짜만 찾기 (너무 많은 날짜가 있으면 제한)
-                        if len(dates) > 10:
-                            print(f"  Too many dates found ({len(dates)}), skipping automatic date parsing")
-                            # 수동으로 특수모집 관련 날짜 찾기
-                            recruit_section = ""
-                            if "특수 모집" in body:
-                                idx = body.find("특수 모집")
-                                recruit_section = body[max(0, idx-200):idx+500]
-                            elif "모집에 합류" in body:
-                                idx = body.find("모집에 합류")
-                                recruit_section = body[max(0, idx-200):idx+500]
-                            
-                            if recruit_section:
-                                recruit_dates = re.findall(r"(\d{1,2})월\s*(\d{1,2})일", recruit_section)
-                                print(f"  Found {len(recruit_dates)} dates in recruit section: {recruit_dates}")
-                                if len(recruit_dates) >= 2:
-                                    y = datetime.now().year
-                                    s = f"{y}-{int(recruit_dates[0][0]):02d}-{int(recruit_dates[0][1]):02d}"
-                                    e = f"{y}-{int(recruit_dates[1][0]):02d}-{int(recruit_dates[1][1]):02d}"
-                                    print(f"  Constructed date range from recruit section: {s} ~ {e}")
-                        else:
-                            y = datetime.now().year
-                            s = f"{y}-{int(dates[0][0]):02d}-{int(dates[0][1]):02d}"
-                            e = f"{y}-{int(dates[1][0]):02d}-{int(dates[1][1]):02d}"
-                            print(f"  Constructed date range: {s} ~ {e}")
-                
-                if s and e:
-                    # 한글 날짜 표시
-                    start_month = int(s[5:7])
-                    start_day = int(s[8:10])
-                    end_month = int(e[5:7])
-                    end_day = int(e[8:10])
+                        char_section = body[char_idx:next_ssr_idx]
                     
-                    # 설명문 생성 (캐릭터명 포함)
-                    if recruit == "특수모집":
-                        description = f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[신규] 특수모집"
+                    print(f"    Character section length: {len(char_section)}")
+                    
+                    # 모집 기간 찾기: YYYY년 MM월 DD일 ... ~ YYYY년 MM월 DD일
+                    date_range_pattern = r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일[^~]*?~[^~]*?(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일"
+                    date_match = re.search(date_range_pattern, char_section)
+                    
+                    if date_match:
+                        y1, m1, d1, y2, m2, d2 = date_match.groups()
+                        start_date = f"{y1}-{int(m1):02d}-{int(d1):02d}"
+                        end_date = f"{y2}-{int(m2):02d}-{int(d2):02d}"
+                        print(f"    Found date range: {start_date} ~ {end_date}")
+                        
+                        # 한글 날짜 표시
+                        start_month = int(m1)
+                        start_day = int(d1)
+                        end_month = int(m2)
+                        end_day = int(d2)
+                        
+                        description = f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[신규] {char_name} 특수모집"
+                        
+                        result = {
+                            "game_id": "nikke",
+                            "version": "",
+                            "update_date": start_date,
+                            "end_date": end_date,
+                            "description": description,
+                            "url": p["url"],
+                        }
+                        out.append(result)
+                        try:
+                            print(f"    *** Added recruit update for {char_name}")
+                        except:
+                            print(f"    *** Added recruit update: [encoding error]")
                     else:
-                        description = f"시작일 : {start_month}월 {start_day}일\n종료일 : {end_month}월 {end_day}일\n[신규] {recruit} 특수모집"
-                    
-                    result = {
-                        "game_id": "nikke",
-                        "version": "",
-                        "update_date": s,
-                        "end_date": e,
-                        "description": description,
-                        "url": p["url"],
-                    }
-                    out.append(result)
-                    try:
-                        print(f"  *** Added recruit update: {result}")
-                    except:
-                        print(f"  *** Added recruit update: [encoding error in output]")
-                else:
-                    try:
-                        print(f"  No date range found for recruit post: {p['title']}")
-                    except:
-                        print("  No date range found for recruit post: [encoding error in title]")
+                        print(f"    No date range found for {char_name}")
+                        
             except Exception as e:
-                print(f"  Date extraction failed: {e}")
+                print(f"  Multiple recruit parsing failed: {e}")
+                import traceback
+                traceback.print_exc()
     
     # 특별 방송 안내 (패턴 완화)
     broadcast_posts = fetch_board_posts(board_broadcast_url, limit)
