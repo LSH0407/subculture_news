@@ -3,7 +3,7 @@ name: Scrape HoYoLAB
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 4 * * *' # 매일 13:00 KST
+    - cron: '0 */12 * * *' # 12시간마다 (09:00, 21:00 KST)
 
 permissions:
   contents: write
@@ -53,7 +53,7 @@ jobs:
           echo "  HOYOLAB_SR_AUTHOR: $HOYOLAB_SR_AUTHOR"
           echo "  HOYOLAB_LIMIT: $HOYOLAB_LIMIT"
           echo "=== Running scraper ==="
-          python scripts/scrape_hoyolab_selenium.py
+          python scripts/scrape_hoyolab.py
           echo "=== Scraper completed ==="
           
       - name: Log action results

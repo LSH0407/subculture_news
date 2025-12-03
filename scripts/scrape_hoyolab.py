@@ -7,6 +7,8 @@ HoYoLAB Selenium 기반 스크래퍼 (기존 스크래퍼 교체)
 import json
 import os
 import re
+import sys
+import io
 from datetime import datetime, timezone
 from typing import Dict, List, Tuple
 
@@ -16,6 +18,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
+# Windows 콘솔 인코딩 문제 해결
+if sys.platform == 'win32':
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    except:
+        pass
 
 
 BASE = "https://www.hoyolab.com"
@@ -155,7 +164,10 @@ def fetch_posts(author_id: str, limit: int = 20) -> List[Dict]:
                         new_title = title_element.text.strip()
                         if new_title:
                             post["title"] = new_title
-                            print(f"  -> 제목 업데이트: {new_title}")
+                            try:
+                                print(f"  -> 제목 업데이트: {new_title[:50]}")
+                            except:
+                                print(f"  -> 제목 업데이트 완료")
                     except Exception as e:
                         print(f"  -> 제목 업데이트 실패: {e}")
                 
@@ -208,13 +220,37 @@ def find_korean_datetime(text: str) -> Tuple[str, str]:
 
 
 def find_korean_daterange(text: str) -> Tuple[str, str]:
-    """Parse a range like '9월 24일 ~ 10월 15일' -> (YYYY-MM-DD, YYYY-MM-DD)."""
-    m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*[~~\-]\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일", text)
+    """Parse a range like '9월 24일 ~ 10월 15일' or '2025/11/26 12:00 ~ 2025/12/16 15:00' -> (YYYY-MM-DD, YYYY-MM-DD)."""
+    # 패턴 00: "YYYY/MM/DD HH:MM ~ YYYY/MM/DD HH:MM" (슬래시 형식, 시간 포함)
+    m = re.search(r"(\d{4})/(\d{1,2})/(\d{1,2})\s+\d{1,2}:\d{2}\s*[~\-\–—]\s*(\d{4})/(\d{1,2})/(\d{1,2})\s+\d{1,2}:\d{2}", text)
+    if m:
+        y1, mm1, dd1, y2, mm2, dd2 = map(int, m.groups())
+        return datetime(y1, mm1, dd1).strftime("%Y-%m-%d"), datetime(y2, mm2, dd2).strftime("%Y-%m-%d")
+    
+    # 패턴 0: "YYYY년 X월 X일 HH:MM ~ YYYY년 X월 X일 HH:MM" (시간 포함, 연도 있음)
+    m = re.search(r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*\d{1,2}:\d{2}\s*[~\-\–—]\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*\d{1,2}:\d{2}", text)
+    if m:
+        y1, mm1, dd1, y2, mm2, dd2 = map(int, m.groups())
+        return datetime(y1, mm1, dd1).strftime("%Y-%m-%d"), datetime(y2, mm2, dd2).strftime("%Y-%m-%d")
+    
+    # 패턴 1: "YYYY년 X월 X일 ~ YYYY년 X월 X일" (연도 있음)
+    m = re.search(r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[~\-\–—]\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일", text)
+    if m:
+        y1, mm1, dd1, y2, mm2, dd2 = map(int, m.groups())
+        return datetime(y1, mm1, dd1).strftime("%Y-%m-%d"), datetime(y2, mm2, dd2).strftime("%Y-%m-%d")
+    
+    # 패턴 2: "X월 X일부터 X월 X일까지"
+    m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*부터.*?(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*까지", text)
+    if not m:
+        # 패턴 3: "X월 X일 ~ X월 X일" (일반 형태)
+        m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*[~\-\–—]\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일", text)
     if not m:
         return "", ""
     y = datetime.now().year
     mm1, dd1, mm2, dd2 = map(int, m.groups())
-    return datetime(y, mm1, dd1).strftime("%Y-%m-%d"), datetime(y, mm2, dd2).strftime("%Y-%m-%d")
+    # 연도 넘어가는 경우 처리 (예: 12월 -> 1월)
+    y2 = y if mm2 >= mm1 else y + 1
+    return datetime(y, mm1, dd1).strftime("%Y-%m-%d"), datetime(y2, mm2, dd2).strftime("%Y-%m-%d")
 
 
 def extract_version(text: str) -> str:
@@ -290,31 +326,44 @@ def parse_zzz(posts: List[Dict]) -> List[Dict]:
             else:
                 print(f"  -> 특별 방송 날짜 파싱 실패 (title: '{title[:50] if title else '(없음)'}', body length: {len(body)})")
             continue
-        # 기간 한정 채널(상/하)
-        if "기간 한정 채널" in title and ver:
-            if "상)" in title or "(상" in title:
+        # 기간 한정 채널 (다양한 패턴 지원)
+        if "기간 한정 채널" in title or "채널" in title and ver:
+            print(f"  -> 기간 한정 채널 후보 발견: {title[:50]}")
+            
+            # 캐릭터명 추출 (「캐릭터명」 패턴)
+            char_names = re.findall(r"「([^」]+)」", title)
+            char_desc = " / ".join(char_names) if char_names else "기간 한정 채널"
+            
+            # 상/하 구분
+            phase = ""
+            if "상)" in title or "(상" in title or "상반기" in title:
+                phase = "(상)"
                 start = version_to_update_date.get(ver, "")
                 _, end = find_korean_daterange(body)
-                if start and end:
-                    results.append({
-                        "game_id": "zzz",
-                        "version": ver,
-                        "update_date": start,
-                        "end_date": end,
-                        "description": build_desc(start.replace("2025-", "").replace("2024-", ""), end.replace("2025-", "").replace("2024-", ""), ["[이벤트] 기간 한정 채널(상)"]),
-                        "url": url,
-                    })
-            elif "하)" in title or "(하" in title:
+            elif "하)" in title or "(하" in title or "하반기" in title:
+                phase = "(하)"
                 start, end = find_korean_daterange(body)
-                if start and end:
-                    results.append({
-                        "game_id": "zzz",
-                        "version": ver,
-                        "update_date": start,
-                        "end_date": end,
-                        "description": build_desc(start.replace("2025-", "").replace("2024-", ""), end.replace("2025-", "").replace("2024-", ""), ["[이벤트] 기간 한정 채널(하)"]),
-                        "url": url,
-                    })
+            else:
+                # 상/하 구분 없는 경우
+                start, end = find_korean_daterange(body)
+                if not start:
+                    start = version_to_update_date.get(ver, "")
+            
+            if start and end:
+                md_s = start.replace("2025-", "").replace("2024-", "").replace("2026-", "")
+                md_e = end.replace("2025-", "").replace("2024-", "").replace("2026-", "")
+                desc = build_desc(md_s, md_e, [f"[이벤트] {char_desc}{phase}"])
+                results.append({
+                    "game_id": "zzz",
+                    "version": ver,
+                    "update_date": start,
+                    "end_date": end,
+                    "description": desc,
+                    "url": url,
+                })
+                print(f"    -> 채널 파싱 성공: {start} ~ {end}, {char_desc}{phase}")
+            else:
+                print(f"    -> 날짜 파싱 실패 (start={start}, end={end})")
     return results
 
 
@@ -325,8 +374,11 @@ def parse_star_rail(posts: List[Dict]) -> List[Dict]:
         title = p["title"]
         body = p.get("body", "")
         ver = extract_version(title + " " + body)
-        if "업데이트 점검 예고" in title and ver:
+        # 업데이트 점검 예고 또는 업데이트 안내에서 시작일 캐싱
+        if ("업데이트 점검 예고" in title or "업데이트 안내" in title) and ver:
             dt_iso, _ = find_korean_datetime(body)
+            if not dt_iso:
+                dt_iso, _ = find_korean_datetime(title)
             if dt_iso:
                 version_to_update_date[ver] = dt_iso.split("T")[0]
 
@@ -335,22 +387,28 @@ def parse_star_rail(posts: List[Dict]) -> List[Dict]:
         body = p.get("body", "")
         url = p["url"]
         ver = extract_version(title + " " + body)
-        # 프리뷰 스페셜 프로그램 (제목 끝에 추가정보 없다고 가정)
-        if "프리뷰 스페셜 프로그램" in title and ver and "-" not in title and "|" not in title:
+        
+        # 프리뷰 스페셜 프로그램
+        if "프리뷰 스페셜 프로그램" in title and ver:
             dt_iso, _ = find_korean_datetime(body)
+            if not dt_iso:
+                dt_iso, _ = find_korean_datetime(title)
             if dt_iso:
                 results.append({
                     "game_id": "star_rail",
                     "version": ver,
                     "update_date": dt_iso,
-                    "description": f"{ver} 프리뷰 스페셜 프로그램",
+                    "description": f"{ver} 버전 프리뷰 스페셜 프로그램",
                     "url": url,
                 })
+                print(f"  -> 프리뷰 스페셜 프로그램 파싱: {ver}")
             continue
-        # 이벤트 워프 (1/2)
+        
+        # 이벤트 워프 (1/2) - 기존 로직
         m = re.search(r"이벤트\s*워프\s*\((\d)\)", title)
         if m and ver:
             y = m.group(1)
+            print(f"  -> 이벤트 워프 발견: {ver} 버전, 페이즈 {y}")
             if y == "1":
                 start = version_to_update_date.get(ver, "")
                 _, end = find_korean_daterange(body)
@@ -380,6 +438,33 @@ def parse_star_rail(posts: List[Dict]) -> List[Dict]:
                         "description": desc,
                         "url": url,
                     })
+            continue
+        
+        # 새로운 패턴: "워프" 키워드가 있는 게시글 (캐릭터 이름 포함)
+        if "워프" in title and ver:
+            print(f"  -> 워프 관련 게시글 발견: {title[:50]}")
+            # 날짜 범위 추출
+            start, end = find_korean_daterange(body)
+            if start and end:
+                # 캐릭터명 추출 시도
+                char_names = re.findall(r"「([^」]+)」", title)
+                if char_names:
+                    char_desc = " / ".join(char_names)
+                else:
+                    char_desc = "이벤트 워프"
+                
+                md_s = start.split("-")
+                md_e = end.split("-")
+                desc = build_desc(f"{int(md_s[1])}/{int(md_s[2])}", f"{int(md_e[1])}/{int(md_e[2])}", [f"[이벤트] {char_desc}"])
+                results.append({
+                    "game_id": "star_rail",
+                    "version": ver,
+                    "update_date": start,
+                    "end_date": end,
+                    "description": desc,
+                    "url": url,
+                })
+                print(f"    -> 워프 파싱 성공: {start} ~ {end}")
     return results
 
 
