@@ -7943,5 +7943,13 @@
     "end_date": "2025-12-16",
     "description": "시작일 : 11/5\n종료일 : 12/16\n[이벤트] 워프 「키레네」",
     "url": "https://www.hoyolab.com/article/42482837"
+  },
+  {
+    "game_id": "zzz",
+    "version": "2.4",
+    "update_date": "2025-11-26",
+    "end_date": "2025-12-17",
+    "description": "시작일 : 11/26\n종료일 : 12/17\n[이벤트] 기간 한정 채널 「다이아린」",
+    "url": "https://www.hoyolab.com/article/42525402"
   }
 ]
