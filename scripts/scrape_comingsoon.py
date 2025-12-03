@@ -116,7 +116,36 @@ def fetch_appdetails(appid: str) -> Dict:
     res = requests.get(APPDETAILS_URL, params=params, headers=headers, timeout=60)
     res.raise_for_status()
     data = res.json()
-    return data.get(appid, {}).get("data", {})
+    app_data = data.get(appid, {}).get("data", {})
+    
+    # 찜 횟수(wishlist count) 정보 가져오기 - Steam Store 페이지에서 추출
+    try:
+        store_url = f"https://store.steampowered.com/app/{appid}/?l=koreana&cc=kr"
+        store_res = requests.get(store_url, headers=headers, timeout=60)
+        if store_res.status_code == 200:
+            soup = BeautifulSoup(store_res.text, "html.parser")
+            # 찜 횟수는 보통 "X명이 이 게임을 찜 목록에 추가했습니다" 형태로 표시
+            wishlist_text_selectors = [
+                ".wishlist_status",
+                ".game_details .details_block",
+                "div:contains('찜')",
+            ]
+            for selector in wishlist_text_selectors:
+                wishlist_el = soup.select_one(selector)
+                if wishlist_el:
+                    text = wishlist_el.get_text()
+                    # "12,345명이 이 게임을 찜" 형태에서 숫자 추출
+                    import re
+                    match = re.search(r"([\d,]+)\s*명.*?찜", text)
+                    if match:
+                        wishlist_str = match.group(1).replace(",", "")
+                        app_data["wishlist_count"] = int(wishlist_str)
+                        break
+    except Exception as e:
+        # 찜 횟수를 가져오지 못해도 계속 진행
+        pass
+    
+    return app_data
 
 def fetch_store_info(appid: str) -> dict:
     """Steam Store 페이지에서 태그와 발매일을 직접 스크래핑 (한국 기준)"""
@@ -172,7 +201,12 @@ def fetch_store_info(appid: str) -> dict:
 
 
 def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
+    # 환경 변수에서 최소 찜 횟수 설정 (기본값: 5000)
+    min_wishlist = int(os.getenv("MIN_WISHLIST_COUNT", "5000"))
+    
     updates = []
+    filtered_count = 0
+    
     for e in entries:
         # month filter (keep items with parseable YYYY-MM-DD only)
         try:
@@ -187,6 +221,13 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
                 details = fetch_appdetails(e["appid"])
             except Exception:
                 details = {}
+        
+        # 찜 횟수 필터링
+        wishlist_count = details.get("wishlist_count", 0)
+        if wishlist_count < min_wishlist:
+            filtered_count += 1
+            print(f"Filtered out {e['name']} (wishlist: {wishlist_count} < {min_wishlist})")
+            continue
         
         # Store 페이지에서 태그와 발매일 수집 (한국 기준)
         store_info = {"tags": [], "release_date": None}
@@ -261,7 +302,14 @@ def to_updates(entries: List[Dict], months: List[int]) -> List[Dict]:
             "tags": tags,
             "summary": summary,
             "header_image": hi_res_header or e.get("header_image", ""),
+            "wishlist_count": wishlist_count,  # 찜 횟수 추가
         })
+    
+    print(f"\n필터링 요약:")
+    print(f"  총 수집: {len(entries)}개")
+    print(f"  필터링됨: {filtered_count}개 (찜 횟수 < {min_wishlist})")
+    print(f"  최종 추가: {len(updates)}개")
+    
     return updates
 
 

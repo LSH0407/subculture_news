@@ -32,6 +32,7 @@ jobs:
         env:
           ROLLING_MONTHS: '3'           # 당일 기준 앞으로 3개월
           MAX_PAGES: '10'               # 더 깊게 탐색
+          MIN_WISHLIST_COUNT: '5000'    # 최소 찜 횟수 (기본값: 5000)
         run: |
           python scripts/scrape_comingsoon.py
           
