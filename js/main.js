@@ -35,13 +35,33 @@ function formatDate(dateStr) {
 }
 
 function filterUpdates(updates) {
-    // 선택된 게임이 없으면 모든 항목 표시
-    if (state.selectedGames.size === 0) {
-        return updates.slice();
-    }
+    // 날짜 필터링: 오늘 기준으로 3개월 이전 ~ 무한대 미래
+    const now = dayjs();
+    const threeMonthsAgo = now.subtract(3, 'month');
     
-    // 선택된 게임들만 필터링
-    return updates.filter(update => {
+    const filtered = updates.filter(update => {
+        // 1. 날짜 체크: update_date 또는 end_date 중 하나라도 3개월 이내면 표시
+        const updateDate = update.update_date ? dayjs(update.update_date) : null;
+        const endDate = update.end_date ? dayjs(update.end_date) : null;
+        
+        // update_date가 3개월 이전이고 end_date도 3개월 이전이면 필터링
+        const isUpdateDateOld = updateDate && updateDate.isBefore(threeMonthsAgo, 'day');
+        const isEndDateOld = endDate && endDate.isBefore(threeMonthsAgo, 'day');
+        
+        // end_date가 있는 경우: end_date가 3개월 이내면 표시
+        if (endDate) {
+            if (isEndDateOld) return false;
+        } else {
+            // end_date가 없는 경우: update_date만 체크
+            if (isUpdateDateOld) return false;
+        }
+        
+        // 2. 게임 필터링
+        // 선택된 게임이 없으면 모든 항목 표시
+        if (state.selectedGames.size === 0) {
+            return true;
+        }
+        
         // Steam 게임 카테고리가 선택된 경우
         if (state.selectedGames.has('steam_all') && update.game_id.startsWith('steam_')) {
             return true;
@@ -55,6 +75,8 @@ function filterUpdates(updates) {
         // 개별 게임이 선택된 경우
         return state.selectedGames.has(update.game_id);
     });
+    
+    return filtered;
 }
 
 function renderStats(filtered) {
