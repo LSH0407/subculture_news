@@ -448,9 +448,11 @@ function toCalendarEvents(updates, gameMap) {
         
         // 이벤트 유형 판정: 업데이트 / 공식방송 / 신규발매
         const pickType = () => {
-            const desc = String(u.description || '').toLowerCase();
+            const desc = String(u.description || '');
             const link = String(u.url || '').toLowerCase();
-            if (desc.includes('방송') || link.includes('youtube.com') || link.includes('youtu.be') || desc.includes('라이브')) {
+            // 방송 키워드: 한글은 toLowerCase() 영향 없으므로 원본 그대로 체크
+            if (desc.includes('방송') || desc.includes('프로그램') || desc.includes('라이브') || 
+                link.includes('youtube.com') || link.includes('youtu.be')) {
                 return 'broadcast';
             }
             // 신규발매: steam coming soon 또는 desc에 발매예정
