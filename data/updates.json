@@ -24,14 +24,6 @@
     "url": "https://naver.me/Gq9bbVId"
   },
   {
-    "game_id": "star_rail",
-    "version": "3.6",
-    "update_date": "2025-09-24T07:00:00+09:00",
-    "end_date": "2025-09-24T12:00:00+09:00",
-    "description": "시작일 : 9/24\n종료일 : 10/15\n[신규] 에버나이트\n[복각] 더 헤르타",
-    "url": "https://cafe.naver.com/honkaistarrail/651565"
-  },
-  {
     "game_id": "switch_pokemon_za",
     "name": "포켓몬스터 LEGENDS Z-A",
     "version": "",
@@ -3372,14 +3364,6 @@
     "tags": "시뮬레이션, 경영, 경제, 포스트아포칼립스, 샌드박스, 건설, 자본주의, 크래프팅, 몰입형 시뮬레이션, 1인칭 슈팅, 생존, 기지 건설, 물리, 슈팅, 3D, 블랙 유머, 공포, 양식화된, 좀비, 1인칭, +, Discord, 찜 목록에 추가, (?)",
     "summary": "좀비 대재앙 속에서 상점을 운영하세요! 배터리를 거래하고, 재고를 만들고, 직원을 관리하고, 언데드 무리를 물리치세요. 영웅이 되시겠습니까, 아니면 어떤 대가를 치르더라도 이익을 남기시겠습니까? 여러분의 선택에 따라 상점과 운명이 결정됩니다.",
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3398110/2244b05e1dcca28000c8bda123be64b333b0e2ad/header.jpg?t=1759755510"
-  },
-  {
-    "game_id": "zzz",
-    "version": "2.3",
-    "update_date": "2025-10-14",
-    "end_date": "2026-01-12",
-    "description": "시작일 : 10-14\n종료일 : 2026-01-12\n[이벤트] 기간 한정 채널(상반기)",
-    "url": "https://www.hoyolab.com/article/41722228"
   },
   {
     "game_id": "nikke",
@@ -7943,5 +7927,21 @@
     "tags": "액션, 어드벤처, +, (?)",
     "summary": "아바타: 프론티어 오브 판도라 - 타오르는 잿불은 신작 영화인 아바타: 불과 재에서 영감을 받은 액션 어드벤처 확장팩입니다.",
     "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3915910/fc06fcb8313dc4d321bd462b9cd65e20f85fe80a/header.jpg?t=1762538418"
+  },
+  {
+    "game_id": "star_rail",
+    "version": "3.7",
+    "update_date": "2025-11-26",
+    "end_date": "2025-12-16",
+    "description": "시작일 : 11/26\n종료일 : 12/16\n[이벤트] 워프(2)",
+    "url": "https://www.hoyolab.com/article/42482837"
+  },
+  {
+    "game_id": "star_rail",
+    "version": "3.7",
+    "update_date": "2025-11-05",
+    "end_date": "2025-12-16",
+    "description": "시작일 : 11/5\n종료일 : 12/16\n[이벤트] 워프 「키레네」",
+    "url": "https://www.hoyolab.com/article/42482837"
   }
 ]
