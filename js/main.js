@@ -430,16 +430,21 @@ function toCalendarEvents(updates, gameMap) {
         // 날짜 유효성 검사 및 변환
         // "2025년", "TBA" 등 파싱 불가능한 날짜 처리
         let eventDate = u.update_date;
+        let isYearOnly = false; // 연도만 있는 날짜인지 표시
         const parsedDate = dayjs(eventDate);
         
         if (!parsedDate.isValid()) {
-            // 연도만 있는 경우 (예: "2025년") -> 해당 연도 12월 31일로 설정
+            // 연도만 있는 경우 (예: "2025년") -> 달력에 표시하지 않음 (TBA 처리)
             const yearMatch = String(eventDate).match(/(\d{4})/);
             if (yearMatch) {
-                eventDate = `${yearMatch[1]}-12-31`;
+                // 연도만 있는 게임은 달력에서 제외 (발매일 미정으로 처리)
+                // 대신 별도의 "발매일 미정" 섹션에서 표시할 수 있음
+                isYearOnly = true;
+                // 달력에 표시하려면 현재 날짜 기준으로 표시 (옵션)
+                // 여기서는 달력에서 제외
+                return;
             } else {
                 // 완전히 파싱 불가능한 경우 (TBA 등) -> 이벤트 생성 건너뛰기
-                // 단, 발매예정 게임은 "TBA" 섹션에 표시할 수 있도록 나중에 처리
                 return;
             }
         }

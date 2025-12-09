@@ -72,16 +72,19 @@ def parse_list(max_pages: int = 3) -> List[Dict]:
             # normalize - 날짜 파싱 개선
             import re
             date_str = "TBA"
-            try:
-                release_dt = date_parser.parse(date_txt, fuzzy=True)
-                date_str = release_dt.strftime("%Y-%m-%d")
-            except Exception:
-                # 파싱 실패시 연도만 추출하여 12월 31일로 설정
-                year_match = re.search(r'(\d{4})', date_txt)
-                if year_match:
-                    date_str = f"{year_match.group(1)}-12-31"
-                else:
-                    date_str = date_txt or "TBA"
+            
+            # 먼저 연도만 있는지 확인 (예: "2025년", "2025")
+            year_only_match = re.match(r'^(\d{4})년?$', date_txt.strip())
+            if year_only_match:
+                # 연도만 있는 경우 - 원본 형식 유지 (프론트엔드에서 처리)
+                date_str = date_txt.strip()
+            else:
+                try:
+                    release_dt = date_parser.parse(date_txt, fuzzy=True)
+                    date_str = release_dt.strftime("%Y-%m-%d")
+                except Exception:
+                    # 파싱 실패시 원본 텍스트 유지
+                    date_str = date_txt.strip() if date_txt else "TBA"
 
             price_norm = price_txt if price_txt else "미표기"
 
