@@ -44,14 +44,29 @@ function filterUpdates(updates) {
         const updateDate = update.update_date ? dayjs(update.update_date) : null;
         const endDate = update.end_date ? dayjs(update.end_date) : null;
         
+        // 유효하지 않은 날짜 형식 처리 (예: "2025년", "TBA" 등)
+        // Steam 발매예정 게임 중 정확한 날짜가 없는 경우도 표시
+        const isUpdateDateValid = updateDate && updateDate.isValid();
+        const isEndDateValid = endDate && endDate.isValid();
+        
+        // 날짜가 유효하지 않으면 (파싱 실패) 필터링하지 않고 표시
+        // 단, Steam/콘솔 발매예정 게임만 해당 (서브컬처 게임은 정확한 날짜 필요)
+        const gameId = String(update.game_id || '');
+        const isComingSoon = gameId.startsWith('steam_') || gameId.startsWith('coming_') || update.platform === 'switch';
+        
+        if (!isUpdateDateValid && !isEndDateValid) {
+            // 발매예정 게임이고 날짜 파싱 실패시 표시
+            return isComingSoon;
+        }
+        
         // update_date가 3개월 이전이고 end_date도 3개월 이전이면 필터링
-        const isUpdateDateOld = updateDate && updateDate.isBefore(threeMonthsAgo, 'day');
-        const isEndDateOld = endDate && endDate.isBefore(threeMonthsAgo, 'day');
+        const isUpdateDateOld = isUpdateDateValid && updateDate.isBefore(threeMonthsAgo, 'day');
+        const isEndDateOld = isEndDateValid && endDate.isBefore(threeMonthsAgo, 'day');
         
         // end_date가 있는 경우: end_date가 3개월 이내면 표시
-        if (endDate) {
+        if (isEndDateValid) {
             if (isEndDateOld) return false;
-        } else {
+        } else if (isUpdateDateValid) {
             // end_date가 없는 경우: update_date만 체크
             if (isUpdateDateOld) return false;
         }
@@ -412,6 +427,23 @@ function toCalendarEvents(updates, gameMap) {
         // 게임 이름 우선순위: games.json의 name > updates.json의 name > game_id
         const title = game?.name || (u.name && u.name.trim() ? u.name : null) || String(u.game_id || '');
         
+        // 날짜 유효성 검사 및 변환
+        // "2025년", "TBA" 등 파싱 불가능한 날짜 처리
+        let eventDate = u.update_date;
+        const parsedDate = dayjs(eventDate);
+        
+        if (!parsedDate.isValid()) {
+            // 연도만 있는 경우 (예: "2025년") -> 해당 연도 12월 31일로 설정
+            const yearMatch = String(eventDate).match(/(\d{4})/);
+            if (yearMatch) {
+                eventDate = `${yearMatch[1]}-12-31`;
+            } else {
+                // 완전히 파싱 불가능한 경우 (TBA 등) -> 이벤트 생성 건너뛰기
+                // 단, 발매예정 게임은 "TBA" 섹션에 표시할 수 있도록 나중에 처리
+                return;
+            }
+        }
+        
         // 디버깅: 게임 이름이 제대로 설정되는지 확인
         if (['nikke', 'star_rail', 'zzz'].includes(u.game_id)) {
             console.log(`Game ID: ${u.game_id}, Game Name: ${game?.name}, Title: ${title}`);
@@ -488,16 +520,16 @@ function toCalendarEvents(updates, gameMap) {
             type,
         };
 
-        const isTimed = typeof u.update_date === 'string' && u.update_date.includes('T');
+        const isTimed = typeof eventDate === 'string' && eventDate.includes('T');
 
         // 날짜가 다른 범위일 때만 시작/종료로 분해 (같은 날 범위는 단일 이벤트로 처리)
-        const startDateOnly = (u.update_date || '').toString().slice(0, 10);
+        const startDateOnly = (eventDate || '').toString().slice(0, 10);
         const endDateOnly = (u.end_date || '').toString().slice(0, 10);
         if (u.end_date && endDateOnly && startDateOnly && endDateOnly !== startDateOnly) {
             // 시작일 이벤트 (단일)
             events.push({
                 title,
-                start: u.update_date,
+                start: eventDate,
                 allDay: !isTimed,
                 backgroundColor: typeColor,
                 borderColor: typeColor,
@@ -518,7 +550,7 @@ function toCalendarEvents(updates, gameMap) {
             // 단일 이벤트
             events.push({
                 title,
-                start: u.update_date,
+                start: eventDate,
                 end: undefined, // 막대 표시 방지
                 allDay: !isTimed,
                 backgroundColor: typeColor,
