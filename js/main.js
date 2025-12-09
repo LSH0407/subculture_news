@@ -421,6 +421,9 @@ document.addEventListener("DOMContentLoaded", init);
 
 function toCalendarEvents(updates, gameMap) {
     const events = [];
+    let steamValidCount = 0;
+    let steamInvalidCount = 0;
+    
     updates.forEach(u => {
         const game = gameMap.get(u.game_id);
         const isNew = String(u.game_id || '').startsWith('steam_') || String(u.game_id || '').startsWith('coming_');
@@ -432,6 +435,22 @@ function toCalendarEvents(updates, gameMap) {
         let eventDate = u.update_date;
         let isYearOnly = false; // 연도만 있는 날짜인지 표시
         const parsedDate = dayjs(eventDate);
+        
+        // Steam 게임 디버깅
+        const isSteam = String(u.game_id || '').startsWith('steam_');
+        if (isSteam) {
+            if (parsedDate.isValid()) {
+                steamValidCount++;
+                if (steamValidCount <= 3) {
+                    console.log(`[Steam OK] ${u.name}: '${eventDate}' -> ${parsedDate.format('YYYY-MM-DD')}`);
+                }
+            } else {
+                steamInvalidCount++;
+                if (steamInvalidCount <= 3) {
+                    console.log(`[Steam FAIL] ${u.name}: '${eventDate}'`);
+                }
+            }
+        }
         
         if (!parsedDate.isValid()) {
             // 연도만 있는 경우 (예: "2025년") -> 달력에 표시하지 않음 (TBA 처리)
@@ -565,6 +584,10 @@ function toCalendarEvents(updates, gameMap) {
             });
         }
     });
+    
+    // Steam 게임 통계 출력
+    console.log(`[Steam 통계] 유효: ${steamValidCount}, 무효: ${steamInvalidCount}, 총 이벤트: ${events.length}`);
+    
     return events;
 }
 
