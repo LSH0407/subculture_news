@@ -69,13 +69,19 @@ def parse_list(max_pages: int = 3) -> List[Dict]:
                     all_imgs = row.select("img")
                     print(f"All img elements: {[img.get('src', '') for img in all_imgs]}")
 
-            # normalize - 일단 원본 날짜 그대로 저장 (나중에 API로 정확한 날짜 확인)
+            # normalize - 날짜 파싱 개선
+            import re
+            date_str = "TBA"
             try:
                 release_dt = date_parser.parse(date_txt, fuzzy=True)
                 date_str = release_dt.strftime("%Y-%m-%d")
             except Exception:
-                # keep original if parsing failed
-                date_str = date_txt or "TBA"
+                # 파싱 실패시 연도만 추출하여 12월 31일로 설정
+                year_match = re.search(r'(\d{4})', date_txt)
+                if year_match:
+                    date_str = f"{year_match.group(1)}-12-31"
+                else:
+                    date_str = date_txt or "TBA"
 
             price_norm = price_txt if price_txt else "미표기"
 
@@ -368,5 +374,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
