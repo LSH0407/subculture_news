@@ -40,61 +40,39 @@ function filterUpdates(updates) {
     const threeMonthsAgo = now.subtract(3, 'month');
     
     const filtered = updates.filter(update => {
-        // 1. 날짜 체크: update_date 또는 end_date 중 하나라도 3개월 이내면 표시
-        const updateDate = update.update_date ? dayjs(update.update_date) : null;
-        const endDate = update.end_date ? dayjs(update.end_date) : null;
-        
-        // 유효하지 않은 날짜 형식 처리 (예: "2025년", "TBA" 등)
-        // Steam 발매예정 게임 중 정확한 날짜가 없는 경우도 표시
-        const isUpdateDateValid = updateDate && updateDate.isValid();
-        const isEndDateValid = endDate && endDate.isValid();
-        
-        // 날짜가 유효하지 않으면 (파싱 실패) 필터링하지 않고 표시
-        // 단, Steam/콘솔 발매예정 게임만 해당 (서브컬처 게임은 정확한 날짜 필요)
         const gameId = String(update.game_id || '');
         const isComingSoon = gameId.startsWith('steam_') || gameId.startsWith('coming_') || update.platform === 'switch';
         
-        if (!isUpdateDateValid && !isEndDateValid) {
-            // 발매예정 게임이고 날짜 파싱 실패시 표시
-            return isComingSoon;
-        }
-        
-        // Steam/Switch 발매예정 게임은 날짜 필터링 건너뛰기 (항상 표시)
-        // 이 게임들은 미래 발매일이므로 3개월 필터를 적용하면 안됨
+        // Steam/Switch 발매예정 게임은 필터링 없이 전부 표시
         if (isComingSoon) {
-            // 게임 필터링으로 바로 이동
-        } else {
-            // 서브컬처 게임 등 일반 업데이트는 3개월 필터 적용
-            // update_date가 3개월 이전이고 end_date도 3개월 이전이면 필터링
-            const isUpdateDateOld = isUpdateDateValid && updateDate.isBefore(threeMonthsAgo, 'day');
-            const isEndDateOld = isEndDateValid && endDate.isBefore(threeMonthsAgo, 'day');
-            
-            // end_date가 있는 경우: end_date가 3개월 이내면 표시
-            if (isEndDateValid) {
-                if (isEndDateOld) return false;
-            } else if (isUpdateDateValid) {
-                // end_date가 없는 경우: update_date만 체크
-                if (isUpdateDateOld) return false;
-            }
+            // 게임 필터 체크만 수행
+            if (state.selectedGames.size === 0) return true;
+            if (state.selectedGames.has('steam_all') && gameId.startsWith('steam_')) return true;
+            if (state.selectedGames.has('switch_all') && update.platform === 'switch') return true;
+            return state.selectedGames.has(gameId);
         }
         
-        // 2. 게임 필터링
-        // 선택된 게임이 없으면 모든 항목 표시
-        if (state.selectedGames.size === 0) {
-            return true;
+        // 서브컬처 게임 등 일반 업데이트는 3개월 필터 적용
+        const updateDate = update.update_date ? dayjs(update.update_date) : null;
+        const endDate = update.end_date ? dayjs(update.end_date) : null;
+        const isUpdateDateValid = updateDate && updateDate.isValid();
+        const isEndDateValid = endDate && endDate.isValid();
+        
+        if (!isUpdateDateValid && !isEndDateValid) {
+            return false; // 날짜 없는 일반 게임은 표시 안함
         }
         
-        // Steam 게임 카테고리가 선택된 경우
-        if (state.selectedGames.has('steam_all') && update.game_id.startsWith('steam_')) {
-            return true;
+        const isUpdateDateOld = isUpdateDateValid && updateDate.isBefore(threeMonthsAgo, 'day');
+        const isEndDateOld = isEndDateValid && endDate.isBefore(threeMonthsAgo, 'day');
+        
+        if (isEndDateValid) {
+            if (isEndDateOld) return false;
+        } else if (isUpdateDateValid) {
+            if (isUpdateDateOld) return false;
         }
         
-        // Switch 게임 카테고리가 선택된 경우
-        if (state.selectedGames.has('switch_all') && update.platform === 'switch') {
-            return true;
-        }
-        
-        // 개별 게임이 선택된 경우
+        // 게임 필터링
+        if (state.selectedGames.size === 0) return true;
         return state.selectedGames.has(update.game_id);
     });
     
