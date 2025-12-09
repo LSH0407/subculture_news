@@ -59,16 +59,23 @@ function filterUpdates(updates) {
             return isComingSoon;
         }
         
-        // update_date가 3개월 이전이고 end_date도 3개월 이전이면 필터링
-        const isUpdateDateOld = isUpdateDateValid && updateDate.isBefore(threeMonthsAgo, 'day');
-        const isEndDateOld = isEndDateValid && endDate.isBefore(threeMonthsAgo, 'day');
-        
-        // end_date가 있는 경우: end_date가 3개월 이내면 표시
-        if (isEndDateValid) {
-            if (isEndDateOld) return false;
-        } else if (isUpdateDateValid) {
-            // end_date가 없는 경우: update_date만 체크
-            if (isUpdateDateOld) return false;
+        // Steam/Switch 발매예정 게임은 날짜 필터링 건너뛰기 (항상 표시)
+        // 이 게임들은 미래 발매일이므로 3개월 필터를 적용하면 안됨
+        if (isComingSoon) {
+            // 게임 필터링으로 바로 이동
+        } else {
+            // 서브컬처 게임 등 일반 업데이트는 3개월 필터 적용
+            // update_date가 3개월 이전이고 end_date도 3개월 이전이면 필터링
+            const isUpdateDateOld = isUpdateDateValid && updateDate.isBefore(threeMonthsAgo, 'day');
+            const isEndDateOld = isEndDateValid && endDate.isBefore(threeMonthsAgo, 'day');
+            
+            // end_date가 있는 경우: end_date가 3개월 이내면 표시
+            if (isEndDateValid) {
+                if (isEndDateOld) return false;
+            } else if (isUpdateDateValid) {
+                // end_date가 없는 경우: update_date만 체크
+                if (isUpdateDateOld) return false;
+            }
         }
         
         // 2. 게임 필터링
