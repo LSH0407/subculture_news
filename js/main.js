@@ -40,39 +40,39 @@ function filterUpdates(updates) {
     const threeMonthsAgo = now.subtract(3, 'month');
     
     const filtered = updates.filter(update => {
-        const gameId = String(update.game_id || '');
-        const isComingSoon = gameId.startsWith('steam_') || gameId.startsWith('coming_') || update.platform === 'switch';
-        
-        // Steam/Switch 발매예정 게임은 필터링 없이 전부 표시
-        if (isComingSoon) {
-            // 게임 필터 체크만 수행
-            if (state.selectedGames.size === 0) return true;
-            if (state.selectedGames.has('steam_all') && gameId.startsWith('steam_')) return true;
-            if (state.selectedGames.has('switch_all') && update.platform === 'switch') return true;
-            return state.selectedGames.has(gameId);
-        }
-        
-        // 서브컬처 게임 등 일반 업데이트는 3개월 필터 적용
+        // 1. 날짜 체크: update_date 또는 end_date 중 하나라도 3개월 이내면 표시
         const updateDate = update.update_date ? dayjs(update.update_date) : null;
         const endDate = update.end_date ? dayjs(update.end_date) : null;
-        const isUpdateDateValid = updateDate && updateDate.isValid();
-        const isEndDateValid = endDate && endDate.isValid();
         
-        if (!isUpdateDateValid && !isEndDateValid) {
-            return false; // 날짜 없는 일반 게임은 표시 안함
-        }
+        // update_date가 3개월 이전이고 end_date도 3개월 이전이면 필터링
+        const isUpdateDateOld = updateDate && updateDate.isBefore(threeMonthsAgo, 'day');
+        const isEndDateOld = endDate && endDate.isBefore(threeMonthsAgo, 'day');
         
-        const isUpdateDateOld = isUpdateDateValid && updateDate.isBefore(threeMonthsAgo, 'day');
-        const isEndDateOld = isEndDateValid && endDate.isBefore(threeMonthsAgo, 'day');
-        
-        if (isEndDateValid) {
+        // end_date가 있는 경우: end_date가 3개월 이내면 표시
+        if (endDate) {
             if (isEndDateOld) return false;
-        } else if (isUpdateDateValid) {
+        } else {
+            // end_date가 없는 경우: update_date만 체크
             if (isUpdateDateOld) return false;
         }
         
-        // 게임 필터링
-        if (state.selectedGames.size === 0) return true;
+        // 2. 게임 필터링
+        // 선택된 게임이 없으면 모든 항목 표시
+        if (state.selectedGames.size === 0) {
+            return true;
+        }
+        
+        // Steam 게임 카테고리가 선택된 경우
+        if (state.selectedGames.has('steam_all') && update.game_id.startsWith('steam_')) {
+            return true;
+        }
+        
+        // Switch 게임 카테고리가 선택된 경우
+        if (state.selectedGames.has('switch_all') && update.platform === 'switch') {
+            return true;
+        }
+        
+        // 개별 게임이 선택된 경우
         return state.selectedGames.has(update.game_id);
     });
     
@@ -406,52 +406,11 @@ document.addEventListener("DOMContentLoaded", init);
 
 function toCalendarEvents(updates, gameMap) {
     const events = [];
-    let steamValidCount = 0;
-    let steamInvalidCount = 0;
-    
     updates.forEach(u => {
         const game = gameMap.get(u.game_id);
         const isNew = String(u.game_id || '').startsWith('steam_') || String(u.game_id || '').startsWith('coming_');
         // 게임 이름 우선순위: games.json의 name > updates.json의 name > game_id
         const title = game?.name || (u.name && u.name.trim() ? u.name : null) || String(u.game_id || '');
-        
-        // 날짜 유효성 검사 및 변환
-        // "2025년", "TBA" 등 파싱 불가능한 날짜 처리
-        let eventDate = u.update_date;
-        let isYearOnly = false; // 연도만 있는 날짜인지 표시
-        const parsedDate = dayjs(eventDate);
-        
-        // Steam 게임 디버깅
-        const isSteam = String(u.game_id || '').startsWith('steam_');
-        if (isSteam) {
-            if (parsedDate.isValid()) {
-                steamValidCount++;
-                if (steamValidCount <= 3) {
-                    console.log(`[Steam OK] ${u.name}: '${eventDate}' -> ${parsedDate.format('YYYY-MM-DD')}`);
-                }
-            } else {
-                steamInvalidCount++;
-                if (steamInvalidCount <= 3) {
-                    console.log(`[Steam FAIL] ${u.name}: '${eventDate}'`);
-                }
-            }
-        }
-        
-        if (!parsedDate.isValid()) {
-            // 연도만 있는 경우 (예: "2025년") -> 달력에 표시하지 않음 (TBA 처리)
-            const yearMatch = String(eventDate).match(/(\d{4})/);
-            if (yearMatch) {
-                // 연도만 있는 게임은 달력에서 제외 (발매일 미정으로 처리)
-                // 대신 별도의 "발매일 미정" 섹션에서 표시할 수 있음
-                isYearOnly = true;
-                // 달력에 표시하려면 현재 날짜 기준으로 표시 (옵션)
-                // 여기서는 달력에서 제외
-                return;
-            } else {
-                // 완전히 파싱 불가능한 경우 (TBA 등) -> 이벤트 생성 건너뛰기
-                return;
-            }
-        }
         
         // 디버깅: 게임 이름이 제대로 설정되는지 확인
         if (['nikke', 'star_rail', 'zzz'].includes(u.game_id)) {
@@ -529,16 +488,16 @@ function toCalendarEvents(updates, gameMap) {
             type,
         };
 
-        const isTimed = typeof eventDate === 'string' && eventDate.includes('T');
+        const isTimed = typeof u.update_date === 'string' && u.update_date.includes('T');
 
         // 날짜가 다른 범위일 때만 시작/종료로 분해 (같은 날 범위는 단일 이벤트로 처리)
-        const startDateOnly = (eventDate || '').toString().slice(0, 10);
+        const startDateOnly = (u.update_date || '').toString().slice(0, 10);
         const endDateOnly = (u.end_date || '').toString().slice(0, 10);
         if (u.end_date && endDateOnly && startDateOnly && endDateOnly !== startDateOnly) {
             // 시작일 이벤트 (단일)
             events.push({
                 title,
-                start: eventDate,
+                start: u.update_date,
                 allDay: !isTimed,
                 backgroundColor: typeColor,
                 borderColor: typeColor,
@@ -559,7 +518,7 @@ function toCalendarEvents(updates, gameMap) {
             // 단일 이벤트
             events.push({
                 title,
-                start: eventDate,
+                start: u.update_date,
                 end: undefined, // 막대 표시 방지
                 allDay: !isTimed,
                 backgroundColor: typeColor,
@@ -569,10 +528,6 @@ function toCalendarEvents(updates, gameMap) {
             });
         }
     });
-    
-    // Steam 게임 통계 출력
-    console.log(`[Steam 통계] 유효: ${steamValidCount}, 무효: ${steamInvalidCount}, 총 이벤트: ${events.length}`);
-    
     return events;
 }
 
