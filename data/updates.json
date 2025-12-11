@@ -5623,6 +5623,13 @@
   },
   {
     "game_id": "ww",
+    "version": "3.0",
+    "update_date": "2025-12-12T20:00:00+09:00",
+    "description": "3.0버전 프리뷰 특별 방송",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/7033218"
+  },
+  {
+    "game_id": "ww",
     "version": "2.8",
     "update_date": "2025-12-11",
     "end_date": "2025-12-24",

@@ -546,14 +546,17 @@ def parse_ww(board_tuning_url: str, board_broadcast_url: str, limit: int = 20) -
         # 이모지 제거 (유니코드 이모지 범위)
         title_clean = re.sub(r'[\U0001F300-\U0001F9FF\u2600-\u26FF\u2700-\u27BF]', '', title)
         
-        # "프리뷰" + "방송" 또는 "특별" + "방송" 키워드로 완화
-        # 제목 또는 본문에 키워드가 있으면 감지
+        # "프리뷰 특별 방송" 공지만 감지 (더 엄격한 조건)
+        # 제목에 "프리뷰" + "방송" 또는 "특별 방송"이 있어야 함
         is_broadcast = (
             ("프리뷰" in title_clean and "방송" in title_clean) or
-            ("특별" in title_clean and "방송" in title_clean) or
-            ("프리뷰" in body and "방송" in body) or
-            ("특별" in body and "방송" in body)
+            ("특별 방송" in title_clean)
         )
+        
+        # 카페, 콜라보, 이모티콘, 애니메이션, 컷신 등 제외
+        exclude_keywords = ["카페", "콜라보", "이모티콘", "애니메이션", "컷신", "스케치", "오프라인 상영회"]
+        if any(kw in title_clean for kw in exclude_keywords):
+            is_broadcast = False
         
         if is_broadcast:
             # "시작됩니다"가 포함된 제목은 과거 공지이므로 스킵
