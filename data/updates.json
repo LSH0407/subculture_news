@@ -5682,5 +5682,37 @@
     "end_date": "2025-12-17",
     "description": "시작일 : 11/26\n종료일 : 12/17\n[이벤트] 기간 한정 채널 「다이아린」",
     "url": "https://www.hoyolab.com/article/42466430"
+  },
+  {
+    "game_id": "star_rail",
+    "version": "3.8",
+    "update_date": "2025-12-17",
+    "end_date": "2026-01-07",
+    "description": "시작일 : 12/17\n종료일 : 1/7\n[이벤트] 달리아 / 반디",
+    "url": "https://www.hoyolab.com/article/42790647"
+  },
+  {
+    "game_id": "ww",
+    "version": "3.0",
+    "update_date": "2025-12-25",
+    "end_date": "2026-01-15",
+    "description": "시작일 : 12월 25일\n종료일 : 1월 15일\n[5성] 카르티시아",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/7102488"
+  },
+  {
+    "game_id": "ww",
+    "version": "3.0",
+    "update_date": "2025-12-25",
+    "end_date": "2026-01-15",
+    "description": "시작일 : 12월 25일\n종료일 : 1월 15일\n[5성] 로코",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/7102525"
+  },
+  {
+    "game_id": "ww",
+    "version": "3.0",
+    "update_date": "2025-12-25",
+    "end_date": "2026-01-15",
+    "description": "시작일 : 12월 25일\n종료일 : 1월 15일\n[5성] 안코",
+    "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/7102439"
   }
 ]

@@ -202,6 +202,19 @@ def fetch_posts(author_id: str, limit: int = 20) -> List[Dict]:
 def find_korean_datetime(text: str) -> Tuple[str, str]:
     """Return (iso_datetime_kst, human_md) from strings like '8월 22일 20:30(KST)'.
     If time missing, returns date only ISO (YYYY-MM-DD)."""
+    # ex: 2025/12/17 06:00 (UTC+8) - 슬래시 형식 (시간 포함, UTC+8)
+    m = re.search(r"(\d{4})/(\d{1,2})/(\d{1,2})\s+(\d{1,2}):(\d{2})\s*[\(（]?\s*UTC\+8\s*[\)）]?", text)
+    if m:
+        y, mm, dd, hh, mi = map(int, m.groups())
+        # UTC+8을 KST(UTC+9)로 변환 (+1시간)
+        dt = datetime(y, mm, dd, hh, mi)
+        return dt.strftime("%Y-%m-%d"), f"{mm}/{dd}"
+    # ex: 2025/12/17 06:00 (서버 시간) - 슬래시 형식 (시간 포함)
+    m = re.search(r"(\d{4})/(\d{1,2})/(\d{1,2})\s+(\d{1,2}):(\d{2})", text)
+    if m:
+        y, mm, dd, hh, mi = map(int, m.groups())
+        dt = datetime(y, mm, dd, hh, mi)
+        return dt.strftime("%Y-%m-%d"), f"{mm}/{dd}"
     # ex: 8월 22일 20:30(KST) 또는 8월 22일 20:30（KST） - 전각 콜론, 전각 공백, KST 변형 모두 지원
     m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*(\d{1,2})[:：]\s*(\d{2})\s*[\(（]?\s*KST\s*[\)）]?", text)
     if m:
@@ -442,12 +455,36 @@ def parse_star_rail(posts: List[Dict]) -> List[Dict]:
             y = m.group(1)
             print(f"  -> 이벤트 워프 발견: {ver} 버전, 페이즈 {y}")
             if y == "1":
+                # 시작일: version_to_update_date에서 가져오거나, 본문에서 직접 추출
                 start = version_to_update_date.get(ver, "")
                 _, end = find_korean_daterange(body)
+                
+                # 시작일이 없으면 본문에서 "YYYY/MM/DD X.X 버전 업데이트 후" 패턴으로 추출
+                if not start:
+                    # "이벤트 워프 기간은 YYYY/MM/DD X.X 버전 업데이트 후" 패턴 먼저 시도
+                    start_match = re.search(r"이벤트\s*워프\s*기간[은는]?\s*(\d{4})/(\d{1,2})/(\d{1,2})\s+\d+\.\d+\s*버전\s*업데이트\s*후", body)
+                    if not start_match:
+                        # "YYYY/MM/DD X.X 버전 업데이트 후" 패턴
+                        start_match = re.search(r"(\d{4})/(\d{1,2})/(\d{1,2})\s+\d+\.\d+\s*버전\s*업데이트\s*후", body)
+                    if start_match:
+                        y1, mm1, dd1 = map(int, start_match.groups())
+                        start = datetime(y1, mm1, dd1).strftime("%Y-%m-%d")
+                        print(f"    -> 본문에서 시작일 추출: {start}")
+                
                 if start and end:
                     md_s = start.split("-")
                     md_e = end.split("-")
-                    desc = build_desc(f"{int(md_s[1])}/{int(md_s[2])}", f"{int(md_e[1])}/{int(md_e[2])}", ["[이벤트] 워프(1)"])
+                    
+                    # 본문에서 캐릭터명 추출
+                    char_names = re.findall(r"「([^」]+)\(", body)
+                    if char_names:
+                        # 중복 제거하고 최대 2개
+                        unique_chars = list(dict.fromkeys(char_names))[:2]
+                        char_desc = " / ".join(unique_chars)
+                        desc = build_desc(f"{int(md_s[1])}/{int(md_s[2])}", f"{int(md_e[1])}/{int(md_e[2])}", [f"[이벤트] {char_desc}"])
+                    else:
+                        desc = build_desc(f"{int(md_s[1])}/{int(md_s[2])}", f"{int(md_e[1])}/{int(md_e[2])}", ["[이벤트] 워프(1)"])
+                    
                     results.append({
                         "game_id": "star_rail",
                         "version": ver,
@@ -456,12 +493,24 @@ def parse_star_rail(posts: List[Dict]) -> List[Dict]:
                         "description": desc,
                         "url": url,
                     })
+                    print(f"    -> 워프(1) 파싱 성공: {start} ~ {end}")
+                else:
+                    print(f"    -> 워프(1) 파싱 실패: start={start}, end={end}")
             else:
                 start, end = find_korean_daterange(body)
                 if start and end:
                     md_s = start.split("-")
                     md_e = end.split("-")
-                    desc = build_desc(f"{int(md_s[1])}/{int(md_s[2])}", f"{int(md_e[1])}/{int(md_e[2])}", ["[이벤트] 워프(2)"])
+                    
+                    # 본문에서 캐릭터명 추출
+                    char_names = re.findall(r"「([^」]+)\(", body)
+                    if char_names:
+                        unique_chars = list(dict.fromkeys(char_names))[:2]
+                        char_desc = " / ".join(unique_chars)
+                        desc = build_desc(f"{int(md_s[1])}/{int(md_s[2])}", f"{int(md_e[1])}/{int(md_e[2])}", [f"[이벤트] {char_desc}"])
+                    else:
+                        desc = build_desc(f"{int(md_s[1])}/{int(md_s[2])}", f"{int(md_e[1])}/{int(md_e[2])}", ["[이벤트] 워프(2)"])
+                    
                     results.append({
                         "game_id": "star_rail",
                         "version": ver,
@@ -470,6 +519,7 @@ def parse_star_rail(posts: List[Dict]) -> List[Dict]:
                         "description": desc,
                         "url": url,
                     })
+                    print(f"    -> 워프(2) 파싱 성공: {start} ~ {end}")
             continue
         
         # 새로운 패턴: "워프" 키워드가 있는 게시글 (캐릭터 이름 포함)
