@@ -5714,5 +5714,28 @@
     "end_date": "2026-01-15",
     "description": "시작일 : 12월 25일\n종료일 : 1월 15일\n[5성] 안코",
     "url": "https://game.naver.com/lounge/WutheringWaves/board/detail/7102439"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-01-01",
+    "end_date": "2026-01-22",
+    "description": "시작일 : 1월 1일\n종료일 : 1월 22일\n[신규] 스노우 화이트 : 헤비암즈 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7121658"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-01-01",
+    "end_date": "2026-01-22",
+    "description": "시작일 : 1월 1일\n종료일 : 1월 22일\n[신규] 라피 : 레드 후드 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7121658"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2025-01-28T23:59:00+09:00",
+    "description": "특별 방송",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7121405"
   }
 ]
