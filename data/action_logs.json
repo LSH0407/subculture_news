@@ -5990,5 +5990,13 @@
     "changes": "0+0-",
     "commit": "44217c3da3735c21e055c1b85fbf0f18e01f17bf",
     "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
+  },
+  {
+    "timestamp": "2026-04-15T14:01:18Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "d725522b20b57099560945a6479b8cc82f8d5417",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
   }
 ]
