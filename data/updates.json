@@ -5848,5 +5848,19 @@
     "end_date": "2026-03-12",
     "description": "시작일 : 2월 12일\n종료일 : 3월 12일\n[신규] Heartbeat Temptation 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/7282687"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-04-23",
+    "description": "특별 방송",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7555436"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-05-13T23:59:00+09:00",
+    "description": "특별 방송",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7552756"
   }
 ]
