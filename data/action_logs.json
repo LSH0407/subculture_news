@@ -6158,5 +6158,13 @@
     "changes": "0+0-",
     "commit": "66e8d90cbc1790a16917b4365a1852353a3be15d",
     "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
+  },
+  {
+    "timestamp": "2026-04-21T03:36:57Z",
+    "action": "hoyolab_events",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "1006c75c9532a837cdebc7bccbf9bbb104a7ff70",
+    "message": "HoYoLAB 이벤트 데이터 업데이트 (젠존제, 스타레일)"
   }
 ]
