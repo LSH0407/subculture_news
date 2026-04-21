@@ -5862,5 +5862,37 @@
     "update_date": "2026-05-13T23:59:00+09:00",
     "description": "특별 방송",
     "url": "https://game.naver.com/lounge/nikke/board/detail/7552756"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-04-23",
+    "end_date": "2026-05-14",
+    "description": "시작일 : 4월 23일\n종료일 : 5월 14일\n[신규] 아니스 : 스타 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7559056"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-04-30",
+    "end_date": "2026-05-21",
+    "description": "시작일 : 4월 30일\n종료일 : 5월 21일\n[신규] 네온 : 비전 아이 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7559056"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-04-23",
+    "end_date": "2026-05-14",
+    "description": "시작일 : 4월 23일\n종료일 : 5월 14일\n[신규] 아비스타 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7559056"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-04-23",
+    "end_date": "2026-05-14",
+    "description": "시작일 : 4월 23일\n종료일 : 5월 14일\n[신규] 아비스타 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7559056"
   }
 ]
