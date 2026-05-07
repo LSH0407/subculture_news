@@ -6686,5 +6686,13 @@
     "changes": "0+0-",
     "commit": "09ab0670e1c82335a4fb7a55afe1d287ada29b46",
     "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2026-05-07T07:47:27Z",
+    "action": "naver_lounge",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "6e68f72bf3008b2681184435523fe6ed11e2ba26",
+    "message": "네이버 게임 라운지 이벤트 데이터 업데이트 (니케, 명조)"
   }
 ]
