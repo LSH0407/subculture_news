@@ -5910,5 +5910,13 @@
     "end_date": "2026-04-22",
     "description": "시작일 : 4월 9일\n종료일 : 4월 22일\n[신규] 백학 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/7509991"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-05-14",
+    "end_date": "2026-06-04",
+    "description": "시작일 : 5월 14일\n종료일 : 6월 4일\n[신규] 민트 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7650508"
   }
 ]
