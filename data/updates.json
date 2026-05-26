@@ -5918,5 +5918,13 @@
     "end_date": "2026-06-04",
     "description": "시작일 : 5월 14일\n종료일 : 6월 4일\n[신규] 민트 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/7650508"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-05-28",
+    "end_date": "2026-06-11",
+    "description": "시작일 : 5월 28일\n종료일 : 6월 11일\n[신규] 프리카 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7709605"
   }
 ]
