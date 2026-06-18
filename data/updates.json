@@ -5934,5 +5934,12 @@
     "end_date": "2026-07-02",
     "description": "시작일 : 6월 11일\n종료일 : 7월 2일\n[신규] 아크레인저 블랙 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/7767444"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-06-27T19:00:00+09:00",
+    "description": "특별 방송",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7815772"
   }
 ]
