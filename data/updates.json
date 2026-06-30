@@ -5941,5 +5941,37 @@
     "update_date": "2026-06-27T19:00:00+09:00",
     "description": "특별 방송",
     "url": "https://game.naver.com/lounge/nikke/board/detail/7815772"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-07-02",
+    "end_date": "2026-07-23",
+    "description": "시작일 : 7월 2일\n종료일 : 7월 23일\n[신규] 신데렐라 : 크리스탈 웨이브 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7860406"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-07-09",
+    "end_date": "2026-07-30",
+    "description": "시작일 : 7월 9일\n종료일 : 7월 30일\n[신규] 마르차나 : 마린 스터디 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7860406"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-07-02",
+    "end_date": "2026-07-23",
+    "description": "시작일 : 7월 2일\n종료일 : 7월 23일\n[신규] 도로시 : 세렌디피티 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7860406"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-07-09",
+    "end_date": "2026-07-30",
+    "description": "시작일 : 7월 9일\n종료일 : 7월 30일\n[신규] 일레그 : 붐 앤 쇼크 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7860406"
   }
 ]
