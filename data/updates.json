@@ -5457,5 +5457,21 @@
     "end_date": "2026-07-30",
     "description": "시작일 : 7월 9일\n종료일 : 7월 30일\n[신규] 일레그 : 붐 앤 쇼크 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/7860406"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-07-23",
+    "end_date": "2026-08-12",
+    "description": "시작일 : 7월 23일\n종료일 : 8월 12일\n[신규] 라플라스 : 얼티밋 히어로 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7959800"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-07-30",
+    "end_date": "2026-08-20",
+    "description": "시작일 : 7월 30일\n종료일 : 8월 20일\n[신규] 맥스웰 : 오디너리 미케닉 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/7959800"
   }
 ]
