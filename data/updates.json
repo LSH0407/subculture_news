@@ -4676,5 +4676,13 @@
     "end_date": "2026-09-10",
     "description": "시작일 : 8월 13일\n종료일 : 9월 10일\n[신규] 점검 완료 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/8042609"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-09-03",
+    "end_date": "2026-09-17",
+    "description": "시작일 : 9월 3일\n종료일 : 9월 17일\n[신규] 드레이크 : 그레이트 빌런 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/8128188"
   }
 ]
