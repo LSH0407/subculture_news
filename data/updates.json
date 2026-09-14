@@ -3736,5 +3736,21 @@
     "end_date": "2026-09-17",
     "description": "시작일 : 9월 3일\n종료일 : 9월 17일\n[신규] 드레이크 : 그레이트 빌런 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/8128188"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-09-17",
+    "end_date": "2026-10-08",
+    "description": "시작일 : 9월 17일\n종료일 : 10월 8일\n[신규] 길티 : 마이티 바니 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/8189601"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-09-24",
+    "end_date": "2026-10-15",
+    "description": "시작일 : 9월 24일\n종료일 : 10월 15일\n[신규] 신 : 스위프트 바니 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/8189601"
   }
 ]
