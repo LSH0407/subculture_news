@@ -3752,5 +3752,28 @@
     "end_date": "2026-10-15",
     "description": "시작일 : 9월 24일\n종료일 : 10월 15일\n[신규] 신 : 스위프트 바니 특수모집",
     "url": "https://game.naver.com/lounge/nikke/board/detail/8189601"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-10-08",
+    "end_date": "2026-10-28",
+    "description": "시작일 : 10월 8일\n종료일 : 10월 28일\n[신규] 벨로타 : 펌킨 위치 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/8289927"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-10-08",
+    "end_date": "2026-10-28",
+    "description": "시작일 : 10월 8일\n종료일 : 10월 28일\n[신규] 벨로타 : 펌킨 위치 특수모집",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/8289927"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-10-24T19:00:00+09:00",
+    "description": "특별 방송",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/8288452"
   }
 ]
