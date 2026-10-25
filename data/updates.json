@@ -3775,5 +3775,12 @@
     "update_date": "2026-10-24T19:00:00+09:00",
     "description": "특별 방송",
     "url": "https://game.naver.com/lounge/nikke/board/detail/8288452"
+  },
+  {
+    "game_id": "nikke",
+    "version": "",
+    "update_date": "2026-11-24T23:59:00+09:00",
+    "description": "특별 방송",
+    "url": "https://game.naver.com/lounge/nikke/board/detail/8360948"
   }
 ]
