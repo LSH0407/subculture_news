@@ -12542,5 +12542,13 @@
     "changes": "0+0-",
     "commit": "28dd1b85b5e0a3522503570008c8553c8987740b",
     "message": "Steam 발매예정 게임 데이터 업데이트"
+  },
+  {
+    "timestamp": "2026-11-12T10:27:27Z",
+    "action": "steam_comingsoon",
+    "status": "success",
+    "changes": "0+0-",
+    "commit": "385fc0155ca63ec3b91d5d5aa38bc7ced1b09214",
+    "message": "Steam 발매예정 게임 데이터 업데이트"
   }
 ]
